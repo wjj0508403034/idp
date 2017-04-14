@@ -8,6 +8,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+
+import com.huoyun.idp.sso.SSOFilter;
 import com.huoyun.idp.user.impl.UserDetailsServiceImpl;
 
 @Configuration
@@ -25,11 +28,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().disable();
-		http.authorizeRequests().anyRequest().fullyAuthenticated();
-		http.formLogin().loginPage("/login.html").loginProcessingUrl("/login")
-				.failureUrl("/login.html?error").permitAll();
-		http.logout().logoutUrl("/logout").logoutSuccessUrl("/login.html")
-				.permitAll();
+		http.addFilterAfter(new SSOFilter() ,
+				BasicAuthenticationFilter.class);
+		//http.authorizeRequests().antMatchers().permitAll().anyRequest().authenticated();
+		//http.formLogin().loginPage("/login.html").loginProcessingUrl("/login")
+		//		.failureUrl("/login.html?error").permitAll();
+		//http.logout().logoutUrl("/logout").logoutSuccessUrl("/login.html")
+		//		.permitAll();
+		//http.sessionManagement().maximumSessions(1).expiredUrl("/expired");
 	}
 
 	@Override

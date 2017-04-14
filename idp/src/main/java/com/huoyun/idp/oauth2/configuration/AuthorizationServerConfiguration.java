@@ -22,7 +22,7 @@ import com.huoyun.idp.oauth2.services.impl.ClientDetailsServiceImpl;
 import com.huoyun.idp.oauth2.services.impl.TokenStoreImpl;
 
 @EnableAuthorizationServer
-@Configuration
+//@Configuration
 @EnableResourceServer
 public class AuthorizationServerConfiguration implements
 		AuthorizationServerConfigurer {

@@ -26,7 +26,7 @@
 		</div>
 	</nav>
 
-	<form action="/login" method="post">
+	<form action="/saml2/idp/ssojson" method="post">
 		<p>
 			<label for="username">用户名</label> <input type="text" id="username"
 				name="username" />
@@ -35,6 +35,9 @@
 			<label for="password">密码</label> <input type="password" id="password"
 				name="password" />
 		</p>
+		
+		<input name="SAMLRequest" type="hidden" th:value="${SAMLRequest}"></input>
+		<input name="RelayState" type="hidden" th:value="${RelayState}"></input>
 
 		<button type="submit" class="btn">登录</button>
 	</form>

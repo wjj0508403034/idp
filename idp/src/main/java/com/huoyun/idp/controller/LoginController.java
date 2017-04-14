@@ -9,10 +9,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.huoyun.idp.common.BusinessException;
 import com.huoyun.idp.common.Facade;
-import com.huoyun.idp.controller.login.LoginData;
 import com.huoyun.idp.controller.login.LoginParam;
 import com.huoyun.idp.user.UserInfo;
-import com.huoyun.idp.user.UserService;
 
 @Controller
 @RequestMapping
@@ -32,12 +30,4 @@ public class LoginController {
 			throws BusinessException {
 		return this.facade.getCurrentUserInfo();
 	}
-
-	// @RequestMapping(value = "/login", method = RequestMethod.POST)
-	// @ResponseBody
-	// public LoginData login(@RequestBody LoginParam loginParam)
-	// throws BusinessException {
-	// return this.facade.getService(UserService.class).login(loginParam);
-	// }
-
 }

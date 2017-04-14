@@ -15,12 +15,13 @@ import com.huoyun.idp.oauth2.services.ClientDetailsService;
 @RequestMapping("/oauth2/clientDetails")
 public class ClientDetailsController {
 
-	@Autowired
-	private ClientDetailsService clientDetailsService;
+	//@Autowired
+	//private ClientDetailsService clientDetailsService;
 	
 	@RequestMapping(method = RequestMethod.POST)
 	@ResponseBody
 	public ClientDetails createClientDetails(@RequestBody ClientDetailsParam clientDetailsParam){
-		return this.clientDetailsService.addClientDetails(clientDetailsParam);
+		//return this.clientDetailsService.addClientDetails(clientDetailsParam);
+		return null;
 	}
 }

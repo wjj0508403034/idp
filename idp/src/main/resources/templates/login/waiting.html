@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 <meta name="renderer" content="webkit" />
 <meta charset="UTF-8" />
-<title>登录</title>
+<title>Waitting</title>
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css" />
 <script
@@ -26,15 +26,12 @@
 		</div>
 	</nav>
 
-	<form action="/login" method="post">
-		<p>
-			<label for="username">用户名</label> <input type="text" id="username"
-				name="username" />
-		</p>
-		<p>
-			<label for="password">密码</label> <input type="password" id="password"
-				name="password" />
-		</p>
+	<form th:action="${destination}" method="post">		
+		<input name="session_index" type="hidden" th:value="${session_index}"></input>
+		<input name="SAMLRequest" type="hidden" th:value="${SAMLRequest}"></input>
+		<input name="SAMLResponse" type="hidden" th:value="${SAMLResponse}"></input>
+		
+		<input name="RelayState" type="hidden" th:value="${RelayState}"></input>
 
 		<button type="submit" class="btn">登录</button>
 	</form>

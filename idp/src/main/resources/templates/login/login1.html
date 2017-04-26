@@ -13,9 +13,10 @@
 	src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
 <link rel="stylesheet" th:href="@{/css/common.css}"></link>
 <link rel="stylesheet" th:href="@{/css/accounts/login.css}"></link>
+<link rel="stylesheet" th:href="@{/css/login.css}"></link>
 </head>
 <body>
-	<nav>
+	<!--<nav>
 		<div class="nav-wrapper">
 			<a href="#" class="brand-logo">Logo</a>
 			<ul id="nav-mobile" class="right hide-on-med-and-down">
@@ -24,25 +25,33 @@
 				<li><a href="collapsible.html">JavaScript</a></li>
 			</ul>
 		</div>
-	</nav>
+	</nav>-->
+ <div class="container-wrap">
+		<form class="login-form" action="/saml2/idp/ssojson" method="post">
+			<p>
+				<label for="username">用户名</label> <input type="text" id="username"
+					name="username" />
+			</p>
+			<p>
+				<label for="password">密码</label> <input type="password" id="password"
+					name="password" />
+			</p>
 
-	<form action="/saml2/idp/ssojson" method="post">
-		<p>
-			<label for="username">用户名</label> <input type="text" id="username"
-				name="username" />
-		</p>
-		<p>
-			<label for="password">密码</label> <input type="password" id="password"
-				name="password" />
-		</p>
-		
-		<input name="SAMLRequest" type="hidden" th:value="${SAMLRequest}"></input>
-		<input name="RelayState" type="hidden" th:value="${RelayState}"></input>
+			<div class="login-help">
+				<div class="login-other-opts">
+					<a class="login-question" href="#">忘记密码</a>
+					<a class="register" href="#">重设密码</a>
+				</div>
+			</div>
+			
+			<input name="SAMLRequest" type="hidden" th:value="${SAMLRequest}"></input>
+			<input name="RelayState" type="hidden" th:value="${RelayState}"></input>
 
-		<button type="submit" class="btn">登录</button>
-	</form>
+			<button type="submit" class="btn login-button">登录</button>
+		</form>
+ </div>
 
-	<footer class="page-footer">
+	<!--<footer class="page-footer">
 		<div class="container">
 			<div class="row">
 				<div class="col l6 s12">
@@ -67,6 +76,6 @@
 					href="#!">More Links</a>
 			</div>
 		</div>
-	</footer>
+	</footer>-->
 </body>
 </html>

@@ -54,7 +54,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 
 		FilterRegistrationBean registration = new FilterRegistrationBean();
 		registration.setFilter(new CookieLoggingFilter());
-		registration.addUrlPatterns("/saml2/idp/ssojson");
+		registration.addUrlPatterns("/saml2/idp/sso");
 		return registration;
 	}
 

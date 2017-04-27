@@ -19,8 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.util.HtmlUtils;
-
 import com.sap.security.saml2.idp.api.AssertionData;
 import com.sap.security.saml2.idp.api.SAML2IdPAPI;
 import com.huoyun.idp.constants.EndpointsConstants;
@@ -29,7 +27,6 @@ import com.huoyun.idp.saml2.utils.SAML2BuilderFactory;
 import com.huoyun.idp.session.SessionManager;
 import com.huoyun.idp.user.entity.User;
 import com.huoyun.idp.utils.RequestUtil;
-import com.huoyun.idp.utils.SSOJsonResult;
 import com.huoyun.idp.web.ViewConstants;
 import com.sap.security.saml2.cfg.exceptions.SAML2ConfigurationException;
 import com.sap.security.saml2.cfg.interfaces.SAML2IdPConfiguration;
@@ -49,21 +46,15 @@ import org.slf4j.LoggerFactory;
 @RequestMapping("/saml2/idp")
 public class SingleSignOnController {
 
-	private static Logger logger = LoggerFactory
-			.getLogger(SingleSignOnController.class);
+	private static Logger logger = LoggerFactory.getLogger(SingleSignOnController.class);
 
-	private static final String WAITING_PATH = "/login/waiting";
 	private static final String SSO_DESTINATION = "destination";
-	private static final String REQUEST_LOCALE_NAME = "locale";
+
 	public static final String LAST_FAILED_TIME = "LAST_FAILED_TIME";
 	public static final String RESPONSE_ADDRESS = "ResponseAddress";
 	final static int FAILED_DURATION = 5 * 60 * 1000;
 
-	private SAML2IdPAPI saml2IdPAPI;
-
-	{
-		this.saml2IdPAPI = SAML2IdPAPI.getInstance();
-	}
+	private SAML2IdPAPI saml2IdPAPI = SAML2IdPAPI.getInstance();
 
 	@Autowired
 	private SessionManager sessionManager;
@@ -74,14 +65,12 @@ public class SingleSignOnController {
 	@Autowired
 	private SAML2IdPConfigurationFactory idpConfigurationFactory;
 
-	@RequestMapping(value = "/ssojson", method = RequestMethod.GET)
-	public ModelAndView ssoNonSaml2(
-			@RequestParam(value = "responseAddress", required = false) String responseAddress,
+	@RequestMapping(value = "/sso", method = RequestMethod.GET)
+	public ModelAndView ssoNonSaml2(@RequestParam(value = "responseAddress", required = false) String responseAddress,
 			@RequestParam(value = "token", required = false) String token,
 			@CookieValue(value = "PL", required = false) String persistentLogin,
-			@RequestParam(value = "locale", required = false) String locale,
-			HttpServletRequest httpRequest, HttpServletResponse httpResponse)
-			throws IOException {
+			@RequestParam(value = "locale", required = false) String locale, HttpServletRequest httpRequest,
+			HttpServletResponse httpResponse) throws IOException {
 		locale = httpRequest.getSession().getAttribute("locale").toString();
 		ModelAndView mv = null;
 
@@ -89,13 +78,11 @@ public class SingleSignOnController {
 			try {
 				LocaleUtils.toLocale(locale);
 			} catch (IllegalArgumentException e) {
-				logger.error("locale: " + locale
-						+ " is invalid, remove and redirect", e);
+				logger.error("locale: " + locale + " is invalid, remove and redirect", e);
 
 				String requestURL = httpRequest.getRequestURL().toString();
 				String queryString = httpRequest.getQueryString();
-				String redirectUrl = queryString.replaceAll(
-						"(&*)locale=([^&]$|[^&]*)", "");
+				String redirectUrl = queryString.replaceAll("(&*)locale=([^&]$|[^&]*)", "");
 
 				httpResponse.sendRedirect(requestURL + "?" + redirectUrl);
 				return null;
@@ -106,21 +93,18 @@ public class SingleSignOnController {
 		clearSession(token, persistentLogin, httpRequest);
 
 		if (null != sessionManager.getIdPSession(httpRequest)) {
-			mv = buildViewWtihSession(responseAddress, locale, httpRequest,
-					httpResponse);
+			mv = buildViewWtihSession(responseAddress, locale, httpRequest, httpResponse);
 
 		} else {
-			mv = buildLoginModelAndView(httpRequest, httpResponse, null, null,
-					"", responseAddress);
+			mv = buildLoginModelAndView(httpRequest, httpResponse, null, null, "", responseAddress);
 		}
 
 		return mv;
 	}
 
-	public ModelAndView buildLoginModelAndView(HttpServletRequest httpRequest,
-			HttpServletResponse httpResponse, String samlRequest,
-			String relayState, String errorMsg, String responseAddress) {
-		ModelAndView m = new ModelAndView(ViewConstants.Login);
+	public ModelAndView buildLoginModelAndView(HttpServletRequest httpRequest, HttpServletResponse httpResponse,
+			String samlRequest, String relayState, String errorMsg, String responseAddress) {
+		ModelAndView m = new ModelAndView(ViewConstants.Login_Waitting);
 		m.getModel().put(HTTPPostBinding.SAML_REQUEST, samlRequest);
 		m.getModel().put(HTTPPostBinding.SAML_RELAY_STATE, relayState);
 		if (StringUtils.isNotEmpty(responseAddress)) {
@@ -131,65 +115,52 @@ public class SingleSignOnController {
 		return m;
 	}
 
-	private ModelAndView buildViewWtihSession(String responseAddress,
-			String locale, HttpServletRequest httpRequest,
+	private ModelAndView buildViewWtihSession(String responseAddress, String locale, HttpServletRequest httpRequest,
 			HttpServletResponse httpResponse) {
 		IdPSession idpSession = sessionManager.getIdPSession(httpRequest);
 		User user = sessionManager.getUser(httpRequest);
 		if (checkIPChanged(httpRequest, idpSession)) {
-			logger.info(
-					"User: '{}' has changed IP Address, old IP: '{}', new IP: '{}', try to logout this user",
-					user.getId(), idpSession.getClientIP(),
-					RequestUtil.getIpAddr(httpRequest));
+			logger.info("User: '{}' has changed IP Address, old IP: '{}', new IP: '{}', try to logout this user",
+					user.getId(), idpSession.getClientIP(), RequestUtil.getIpAddr(httpRequest));
 		}
 
 		return new ModelAndView(responseAddress);
 	}
 
-	@RequestMapping(value = "/ssojson", method = RequestMethod.POST, params = { "SAMLRequest" })
-	public ModelAndView sso(
-			@RequestParam("SAMLRequest") String samlRequest,
-			@RequestParam(value = "RelayState", required = false) String relayState,
-			@RequestParam(value = "locale", required = false) String locale,
-			@CookieValue(value = "PL", required = false) String persistentLogin,
-			HttpServletRequest httpRequest, HttpServletResponse httpResponse)
-			throws SAML2ErrorResponseException, SAML2Exception,
-			SAML2ConfigurationException {
+	@RequestMapping(value = "/sso", method = RequestMethod.POST, params = { "SAMLRequest" })
+	public ModelAndView sso(@RequestParam("SAMLRequest") String samlRequest,
+			@RequestParam(value = "RelayState", required = false) String relayState, HttpServletRequest httpRequest,
+			HttpServletResponse httpResponse)
+			throws SAML2ErrorResponseException, SAML2Exception, SAML2ConfigurationException {
 
 		IdPSession idpSession = sessionManager.getIdPSession(httpRequest);
 
 		if (null != idpSession) {
-			return loginWithIDPSession(samlRequest, relayState, httpRequest,
-					idpSession, httpResponse);
+			return loginWithIDPSession(samlRequest, relayState, httpRequest, idpSession, httpResponse);
 
 		}
-		return buildLoginModelAndView(httpRequest, httpResponse, samlRequest,
-				relayState, null);
+
+		ModelAndView m = new ModelAndView(ViewConstants.Login);
+		m.getModel().put(HTTPPostBinding.SAML_REQUEST, samlRequest);
+		m.getModel().put(HTTPPostBinding.SAML_RELAY_STATE, relayState);
+		httpResponse.setHeader("Cache-Control", "no-cache");
+		return m;
 	}
 
-	@RequestMapping(value = "/ssojson", method = RequestMethod.POST, params = {
-			"SAMLRequest", "username", "password" })
-	public ModelAndView sso(
-			@RequestParam("SAMLRequest") String samlRequest,
+	@RequestMapping(value = "/login", method = RequestMethod.POST, params = { "SAMLRequest", "username", "password" })
+	public ModelAndView sso(@RequestParam("SAMLRequest") String samlRequest,
 			@RequestParam(value = "RelayState", required = false) String relayState,
-			@RequestParam("username") String username,
-			@RequestParam("password") String password,
-			@RequestParam(value = "captcha", required = false) String captcha,
-			@RequestParam(value = "locale", required = false) String locale,
-			@RequestParam(value = "rememberMe", required = false) String rememberMe,
+			@RequestParam("username") String username, @RequestParam("password") String password,
 			HttpServletRequest httpRequest, HttpServletResponse httpResponse)
-			throws SAML2ErrorResponseException, SAML2Exception,
-			SAML2ConfigurationException {
+			throws SAML2ErrorResponseException, SAML2Exception, SAML2ConfigurationException {
 		logger.info("sso start...");
 		refreshSession(httpRequest);
 
-		SAML2IdPConfiguration configuration = idpConfigurationFactory
-				.getDefaultSAML2IdpConfiguration();
+		SAML2IdPConfiguration configuration = idpConfigurationFactory.getDefaultSAML2IdpConfiguration();
 
 		String authnRequestXML = base64decode(samlRequest);
-		SSORequestInfo ssoRequestInfo = saml2BuilderFactory
-				.validateAuthnRequestHttpBody(configuration, authnRequestXML,
-						relayState, httpRequest.getRequestURL().toString());
+		SSORequestInfo ssoRequestInfo = saml2BuilderFactory.validateAuthnRequestHttpBody(configuration, authnRequestXML,
+				relayState, httpRequest.getRequestURL().toString());
 
 		if (StringUtils.isBlank(username)) {
 			// return SSOJsonResult.buildFailure(i18nWorker.getLocalizedMessage(
@@ -201,80 +172,11 @@ public class SingleSignOnController {
 			// "login.password.empty.error", httpRequest));
 		}
 
-		// SSOJsonResult result = userService.validaCaptcha(httpRequest,
-		// username,
-		// captcha);
-		// if (result != null) {
-		// return result;
-		// }
-
-		// UserService.LoginResult loginResult = userService.login(username,
-		// password);
-		// logger.debug(loginResult.getStatus().toString());
-		// SSOJsonResult result = parseLoginResult(samlRequest, relayState,
-		// locale, rememberMe,
-		// httpRequest, httpResponse, configuration, ssoRequestInfo
-		// );
 		User user = new User();
 		user.setId(123456l);
-		SPSession spSession = sessionManager.saveLoginSession(httpRequest,
-				configuration, ssoRequestInfo, user);
+		SPSession spSession = sessionManager.saveLoginSession(httpRequest, configuration, ssoRequestInfo, user);
 
-		// log(loginResult.getUser().getId(),
-		// RequestUtil.getIpAddr(httpRequest), spSession.getSPName());
-		// auditLog(loginResult.getUser().getNamedUserBinding().getUsername());
-		return this.buildSSOResponseModelAndView(httpRequest, spSession,
-				ssoRequestInfo);
-		// logger.info("sso end...");
-		// return result;
-	}
-
-	
-
-	public SSOJsonResult buildSSOResponse(HttpServletRequest httpRequest,
-			SPSession spSession, SSORequestInfo ssoRequestInfo, String locale)
-			throws SAML2Exception, SAML2ConfigurationException {
-		IdPSession idpSession = sessionManager.getIdPSession(httpRequest);
-		SAML2IdPConfiguration configuration = sessionManager
-				.getIdPConfiguration(httpRequest);
-		AssertionData data = new AssertionData(idpSession.getSubjectId());
-		data.setSessionIndex(spSession.getSessionIndex());
-
-		SAML2Response r = saml2IdPAPI.createSSOResponse(configuration,
-				spSession.getSPName(), data);
-
-		Map<String, Object> redirectParam = new HashMap<String, Object>();
-		redirectParam.put(HTTPPostBinding.SAML_RESPONSE,
-				SAML2Utils.encodeBase64AsString(r.generate()));
-		redirectParam.put(HTTPPostBinding.SAML_RELAY_STATE,
-				ssoRequestInfo.getRelayState());
-		// redirectParam.put(SSO_DESTINATION, r.getDestination());
-		addSessionIndexInLandscape(httpRequest, redirectParam, idpSession);
-		String redirectURL = r.getDestination();
-		// if (validateLocale(locale) != null) {
-		// if (redirectURL.indexOf("?") != -1) {
-		// redirectURL += "&locale=" + locale;
-		// } else {
-		// redirectURL += "?locale=" + locale;
-		// }
-		// }
-
-		return SSOJsonResult.buildRedirect(HtmlUtils.htmlEscape(redirectURL),
-				"POST", redirectParam);
-	}
-
-	private void addSessionIndexInLandscape(HttpServletRequest httpRequest,
-			Map<String, Object> redirectParam, IdPSession idpSession) {
-		if (httpRequest.getSession().getAttribute("session_index") != null) {
-			Object sessionIndex = httpRequest.getSession().getAttribute(
-					"session_index");
-			redirectParam.put("session_index", sessionIndex);
-		} else {
-			String sessionIndex = Integer.toHexString(idpSession.hashCode());
-			httpRequest.getSession()
-					.setAttribute("session_index", sessionIndex);
-			redirectParam.put("session_index", sessionIndex);
-		}
+		return this.buildSSOResponseModelAndView(httpRequest, spSession, ssoRequestInfo);
 	}
 
 	private void refreshSession(HttpServletRequest httpRequest) {
@@ -308,125 +210,71 @@ public class SingleSignOnController {
 		logger.info("refreshSession end...");
 	}
 
-	private void clearSession(String token, String persistentLogin,
-			HttpServletRequest httpRequest) {
-		if (StringUtils.isNotBlank(token)
-				|| StringUtils.isNotBlank(persistentLogin)) {
+	private void clearSession(String token, String persistentLogin, HttpServletRequest httpRequest) {
+		if (StringUtils.isNotBlank(token) || StringUtils.isNotBlank(persistentLogin)) {
 			sessionManager.invalidateLoginSession(httpRequest);
 		}
 	}
 
-	public ModelAndView buildLoginModelAndView(HttpServletRequest httpRequest,
-			HttpServletResponse httpResponse, String samlRequest,
-			String relayState, String errorMsg) {
-		ModelAndView m = new ModelAndView(ViewConstants.Login);
-		m.getModel().put(HTTPPostBinding.SAML_REQUEST, samlRequest);
-		m.getModel().put(HTTPPostBinding.SAML_RELAY_STATE, relayState);
-		httpResponse.setHeader("Cache-Control", "no-cache");
-		return m;
-	}
-
-	private ModelAndView loginWithIDPSession(String samlRequest,
-			String relayState, HttpServletRequest httpRequest,
+	private ModelAndView loginWithIDPSession(String samlRequest, String relayState, HttpServletRequest httpRequest,
 			IdPSession idpSession, HttpServletResponse httpResponse)
-			throws SAML2Exception, SAML2ConfigurationException,
-			SAML2ErrorResponseException {
-		SAML2IdPConfiguration configuration = sessionManager
-				.getIdPConfiguration(httpRequest);
+			throws SAML2Exception, SAML2ConfigurationException, SAML2ErrorResponseException {
+		SAML2IdPConfiguration configuration = sessionManager.getIdPConfiguration(httpRequest);
 		User user = sessionManager.getUser(httpRequest);
 		if (checkIPChanged(httpRequest, idpSession)) {
-			logger.info(
-					"User: '{}' has changed IP Address, old IP: '{}', new IP: '{}', try to logout this user",
-					user.getId(), idpSession.getClientIP(),
-					RequestUtil.getIpAddr(httpRequest));
+			logger.info("User: '{}' has changed IP Address, old IP: '{}', new IP: '{}', try to logout this user",
+					user.getId(), idpSession.getClientIP(), RequestUtil.getIpAddr(httpRequest));
 		}
 
-		// UserService.LoginStatus loginStatus = userService
-		// .checkCustomerServiceUnitTenantStatus(user);
-		// if (loginStatus.equals(LoginStatus.Ok)) {
 		String authnRequestXML = base64decode(samlRequest);
-		SSORequestInfo ssoRequestInfo = saml2BuilderFactory
-				.validateAuthnRequestHttpBody(configuration, authnRequestXML,
-						relayState, httpRequest.getRequestURL().toString());
-		SPSession spSession = sessionManager.saveLoginSession(httpRequest,
-				ssoRequestInfo);
-		logger.info(
-				"User: '{}' had IDPSession,  successfully login IDP, client ip: '{}', from: '{}'",
-				user.getId(), RequestUtil.getIpAddr(httpRequest),
-				spSession.getSPName());
-		return buildSSOResponseModelAndView(httpRequest, spSession,
-				ssoRequestInfo);
-		// } else if (LoginStatus.NeedPasswordChange.equals(loginStatus)) {
-		// persisitenceChangePasswdLog(user.getId(),
-		// RequestUtil.getIpAddr(httpRequest));
-		// changePasswdAuditLog(user.getNamedUserBinding().getUsername());
-		// addTokenToHeader(httpRequest, httpResponse);
-		// ModelAndView mv = ssoApi.buildChangePasswordModelAndView(
-		// httpRequest, samlRequest, relayState, null, null);
-		// mv.setViewName("/changepassword_json.jsp");
-		// return mv;
-		// }
-		//
-		// return ssoApi.buildLoginModelAndView(httpRequest, httpResponse,
-		// samlRequest, relayState, "error." + loginStatus.toString());
+		SSORequestInfo ssoRequestInfo = saml2BuilderFactory.validateAuthnRequestHttpBody(configuration, authnRequestXML,
+				relayState, httpRequest.getRequestURL().toString());
+		SPSession spSession = sessionManager.saveLoginSession(httpRequest, ssoRequestInfo);
+		logger.info("User: '{}' had IDPSession,  successfully login IDP, client ip: '{}', from: '{}'", user.getId(),
+				RequestUtil.getIpAddr(httpRequest), spSession.getSPName());
+		return buildSSOResponseModelAndView(httpRequest, spSession, ssoRequestInfo);
 	}
 
-	private ModelAndView buildSSOResponseModelAndView(
-			HttpServletRequest httpRequest, SPSession spSession,
-			SSORequestInfo ssoRequestInfo) throws SAML2Exception,
-			SAML2ConfigurationException {
-		ModelAndView m = new ModelAndView(WAITING_PATH);
+	private ModelAndView buildSSOResponseModelAndView(HttpServletRequest httpRequest, SPSession spSession,
+			SSORequestInfo ssoRequestInfo) throws SAML2Exception, SAML2ConfigurationException {
+		ModelAndView m = new ModelAndView(ViewConstants.Login_Waitting);
 		IdPSession idpSession = sessionManager.getIdPSession(httpRequest);
-		SAML2IdPConfiguration configuration = sessionManager
-				.getIdPConfiguration(httpRequest);
-		AssertionData data = new com.sap.security.saml2.idp.api.AssertionData(
-				idpSession.getSubjectId());
+		SAML2IdPConfiguration configuration = sessionManager.getIdPConfiguration(httpRequest);
+		AssertionData data = new com.sap.security.saml2.idp.api.AssertionData(idpSession.getSubjectId());
 		data.setSessionIndex(spSession.getSessionIndex());
 
 		addSessionIndexInLandscape(httpRequest, m, idpSession);
 
-		SAML2Response r = saml2IdPAPI.createSSOResponse(configuration,
-				spSession.getSPName(), data);
-		m.getModel().put(HTTPPostBinding.SAML_RESPONSE,
-				SAML2Utils.encodeBase64AsString(r.generate()));
-		m.getModel().put(HTTPPostBinding.SAML_RELAY_STATE,
-				ssoRequestInfo.getRelayState());
+		SAML2Response r = saml2IdPAPI.createSSOResponse(configuration, spSession.getSPName(), data);
+		m.getModel().put(HTTPPostBinding.SAML_RESPONSE, SAML2Utils.encodeBase64AsString(r.generate()));
+		m.getModel().put(HTTPPostBinding.SAML_RELAY_STATE, ssoRequestInfo.getRelayState());
 		m.getModel().put(SSO_DESTINATION, r.getDestination());
-		m.getModel().put(REQUEST_LOCALE_NAME,
-				httpRequest.getParameter(REQUEST_LOCALE_NAME));
 		return m;
 	}
 
-	private void addSessionIndexInLandscape(HttpServletRequest httpRequest,
-			ModelAndView m, IdPSession idpSession) {
+	private void addSessionIndexInLandscape(HttpServletRequest httpRequest, ModelAndView m, IdPSession idpSession) {
 		if (httpRequest.getSession().getAttribute("session_index") != null) {
-			Object sessionIndex = httpRequest.getSession().getAttribute(
-					"session_index");
+			Object sessionIndex = httpRequest.getSession().getAttribute("session_index");
 			m.getModel().put("session_index", sessionIndex);
 		} else {
 			String sessionIndex = Integer.toHexString(idpSession.hashCode());
-			httpRequest.getSession()
-					.setAttribute("session_index", sessionIndex);
+			httpRequest.getSession().setAttribute("session_index", sessionIndex);
 			m.getModel().put("session_index", sessionIndex);
 		}
 	}
 
 	private String base64decode(String samlRequest) throws SAML2Exception {
 		try {
-			String authnRequestXML = SAML2Utils
-					.decodeBase64AsString(samlRequest);
+			String authnRequestXML = SAML2Utils.decodeBase64AsString(samlRequest);
 
 			return authnRequestXML;
 		} catch (SAML2Exception e) {
-			logger.warn(
-					"decode samlrequest failed, samlrequest: {}, exception: {}",
-					samlRequest, e);
+			logger.warn("decode samlrequest failed, samlrequest: {}, exception: {}", samlRequest, e);
 			throw e;
 		}
 	}
 
-	private boolean checkIPChanged(HttpServletRequest httpRequest,
-			IdPSession idpSession) {
+	private boolean checkIPChanged(HttpServletRequest httpRequest, IdPSession idpSession) {
 
 		String clientIp = RequestUtil.getIpAddr(httpRequest);
 		String ipInSession = idpSession.getClientIP();

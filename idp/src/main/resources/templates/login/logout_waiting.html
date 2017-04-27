@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="renderer" content="webkit" />
+<meta charset="UTF-8" />
+<title>正在登出...</title>
+</head>
+<body onload="document.forms[0].submit()">
+	<form th:action="${destination}" method="post">
+		<input name="SAMLResponse" type="hidden" th:value="${SAMLResponse}"></input>
+		<input name="RelayState" type="hidden" th:value="${RelayState}"></input>
+		<button type="submit" class="btn">登出</button>
+	</form>
+</body>
+</html>

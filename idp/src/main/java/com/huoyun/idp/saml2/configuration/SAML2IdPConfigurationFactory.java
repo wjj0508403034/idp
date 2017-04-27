@@ -46,7 +46,7 @@ public class SAML2IdPConfigurationFactory {
 			PrivateKey privKey = kf.generatePrivate(kspec);
 
 			// init localIdp
-			String idpDomain = "localhost";
+			String idpDomain = "HuoYunIDP";
 			logger.info("the IDP DOMAIN LOAD FROM CMT is: '{}'", idpDomain);
 
 			localIdP = new SAML2LocalIdPCustomImpl(idpDomain, privKey, privKey);

@@ -30,14 +30,6 @@ public class SSOFilter extends GenericFilterBean {
 		LOGGER.info("IDP Request start, method: [{}], url: [{}].", method,
 				requestURL);
 
-		String uri = httpRequest.getRequestURI();
-		if (uri.endsWith("/saml2/idp/sso")
-				|| uri.endsWith("/saml2/idp/changepassword")) {
-			HttpServletResponse httpResp = (HttpServletResponse) response;
-			httpResp.setStatus(HttpServletResponse.SC_FORBIDDEN);
-			return;
-		}
-
 		chain.doFilter(httpRequest, response);
 		long stopWatch = System.currentTimeMillis() - startTime;
 		LOGGER.info("IDP Request end, method: [{}], url: [{}], cost: [{}]ms.",

@@ -12,7 +12,7 @@
 	<form th:action="${destination}" method="post">
 		<input name="SAMLResponse" type="hidden" th:value="${SAMLResponse}"></input>
 		<input name="RelayState" type="hidden" th:value="${RelayState}"></input>
-		<button type="submit" class="btn">登出</button>
+		<button type="submit" class="btn" style="display: none;">登出</button>
 	</form>
 </body>
 </html>

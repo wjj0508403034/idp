@@ -3,6 +3,7 @@ package com.huoyun.idp.saml2.configuration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.huoyun.idp.saml2.SAML2Properties;
 import com.huoyun.idp.saml2.slo.SingleLogoutService;
 import com.huoyun.idp.saml2.slo.impl.SingleLogoutServiceImpl;
 import com.huoyun.idp.saml2.utils.SAML2BuilderFactory;
@@ -17,8 +18,8 @@ public class SAML2AutoConfiguration {
 	}
 	
 	@Bean
-	public SAML2IdPConfigurationFactory configurationFactory(){
-		return new SAML2IdPConfigurationFactory();
+	public SAML2IdPConfigurationFactory configurationFactory(SAML2Properties saml2Properties){
+		return new SAML2IdPConfigurationFactory(saml2Properties);
 	}
 	
 	@Bean

@@ -6,35 +6,36 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 <meta name="renderer" content="webkit" />
 <meta charset="UTF-8" />
-<title>登录</title>
+<title>注册</title>
 <link rel="stylesheet" th:href="@{/css/login.css}"></link>
 </head>
 <body>
 	<div class="container-wrap">
-		<form class="login-form" action="/saml2/idp/login" method="post">
+		<form class="login-form" action="/register" method="post">
 
 			<p>
 				<label for="username">用户名</label>
 				<input type="text" id="username" name="username" />
-			<div th:if="${errors != null and errors.containsKey('username')}" th:text="#{${errors.username}}"></div>
+			<div th:if="${errors != null and errors.containsKey('username')}"
+				th:text="#{${errors.username}}"></div>
 			</p>
 
 
 			<p>
 				<label for="password">密码</label>
 				<input type="password" id="password" name="password" />
-			<div th:if="${errors != null and errors.containsKey('password')}" th:text="#{${errors.password}}"></div>
+			<div th:if="${errors != null and errors.containsKey('password')}"
+				th:text="#{${errors.password}}"></div>
 			</p>
 
+			<p>
+				<label for="password">重复密码</label>
+				<input type="password" id="repeatPassword" name="repeatPassword" />
+			<div
+				th:if="${errors != null and errors.containsKey('repeatPassword')}"
+				th:text="#{${errors.repeatPassword}}"></div>
+			</p>
 
-			<div class="login-help">
-				<div class="login-other-opts">
-					<a class="login-question" href="#">忘记密码</a>
-				</div>
-			</div>
-
-			<input name="SAMLRequest" type="hidden" th:value="${SAMLRequest}"></input>
-			<input name="RelayState" type="hidden" th:value="${RelayState}"></input>
 
 			<button type="submit" class="btn login-button">登录</button>
 		</form>

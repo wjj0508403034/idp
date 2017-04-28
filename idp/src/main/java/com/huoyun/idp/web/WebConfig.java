@@ -49,13 +49,13 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 		return registrationBean;
 	}
 
-	@Bean
-	public FilterRegistrationBean cookieLoggingFilterRegistration() {
-
-		FilterRegistrationBean registration = new FilterRegistrationBean();
-		registration.setFilter(new CookieLoggingFilter());
-		registration.addUrlPatterns("/saml2/idp/sso");
-		return registration;
-	}
+//	@Bean
+//	public FilterRegistrationBean cookieLoggingFilterRegistration() {
+//
+//		FilterRegistrationBean registration = new FilterRegistrationBean();
+//		registration.setFilter(new CookieLoggingFilter());
+//		registration.addUrlPatterns("/saml2/idp/sso");
+//		return registration;
+//	}
 
 }

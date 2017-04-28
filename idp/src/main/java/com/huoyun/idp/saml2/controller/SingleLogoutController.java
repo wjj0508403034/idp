@@ -25,6 +25,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.huoyun.idp.common.BusinessException;
 import com.huoyun.idp.constants.EndpointsConstants;
+import com.huoyun.idp.saml2.SAML2Constants;
 import com.huoyun.idp.saml2.configuration.SAML2IdPConfigurationFactory;
 import com.huoyun.idp.saml2.slo.SingleLogoutService;
 import com.huoyun.idp.session.IdPSessionImpl;
@@ -54,8 +55,6 @@ import com.sap.security.saml2.lib.interfaces.protocols.SAML2LogoutResponse;
 @RequestMapping("/saml2/idp")
 public class SingleLogoutController {
 	private static Logger LOG = LoggerFactory.getLogger(SingleLogoutController.class);
-
-	private static final String SSO_DESTINATION = "destination";
 
 	@Autowired
 	private SessionManager sessionManager;
@@ -275,7 +274,7 @@ public class SingleLogoutController {
 
 		m.getModel().put(HTTPPostBinding.SAML_RESPONSE, SAML2Utils.encodeBase64AsString(r.generate()));
 		m.getModel().put(HTTPPostBinding.SAML_RELAY_STATE, sloRequestInfo.getRelayState());
-		m.getModel().put(SSO_DESTINATION, r.getDestination());
+		m.getModel().put(SAML2Constants.DESTINATION, r.getDestination());
 		return m;
 	}
 
@@ -414,7 +413,7 @@ public class SingleLogoutController {
 
 		m.getModel().put(HTTPPostBinding.SAML_REQUEST, SAML2Utils.encodeBase64AsString(r.generate()));
 		m.getModel().put(HTTPPostBinding.SAML_RELAY_STATE, relayState);
-		m.getModel().put(SSO_DESTINATION, r.getDestination());
+		m.getModel().put(SAML2Constants.DESTINATION, r.getDestination());
 		return m;
 	}
 

@@ -54,4 +54,10 @@ public class UserServiceImpl implements UserService {
 	public User getUserByName(String username) {
 		return this.facade.getService(UserRepo.class).getUserByEmail(username);
 	}
+
+	@Override
+	public void createUser(User user) {
+		this.facade.getService(UserRepo.class).save(user);
+		
+	}
 }

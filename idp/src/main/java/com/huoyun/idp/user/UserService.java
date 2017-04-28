@@ -6,9 +6,12 @@ import com.huoyun.idp.controller.login.LoginParam;
 import com.huoyun.idp.user.entity.User;
 
 public interface UserService {
+	
 	LoginData login(LoginParam loginParam) throws BusinessException;
 
 	void checkBeforeLogin(String username) throws BusinessException;
 	
 	User getUserByName(String username);
+	
+	void createUser(User user);
 }

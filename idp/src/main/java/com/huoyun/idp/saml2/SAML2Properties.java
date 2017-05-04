@@ -11,6 +11,8 @@ public class SAML2Properties {
 	private String privateKey;
 	private String idpDomain;
 	private String ssoLocation;
+	private String defaultSpLocation;
+	
 	public String getPublicKey() {
 		return publicKey;
 	}
@@ -34,6 +36,12 @@ public class SAML2Properties {
 	}
 	public void setSsoLocation(String ssoLocation) {
 		this.ssoLocation = ssoLocation;
+	}
+	public String getDefaultSpLocation() {
+		return defaultSpLocation;
+	}
+	public void setDefaultSpLocation(String defaultSpLocation) {
+		this.defaultSpLocation = defaultSpLocation;
 	}
 	
 }

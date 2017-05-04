@@ -50,7 +50,6 @@ public class SAML2IdPConfigurationFactory {
 			PrivateKey privKey = kf.generatePrivate(kspec);
 
 			String idpDomain = this.saml2Properties.getIdpDomain();
-			logger.info("the IDP DOMAIN LOAD FROM CMT is: '{}'", idpDomain);
 
 			localIdP = new SAML2LocalIdPCustomImpl(idpDomain, privKey, privKey);
 			localIdP.setSigningCertificate(cert);
@@ -85,5 +84,9 @@ public class SAML2IdPConfigurationFactory {
 
 		logger.info("getDefaultSAML2IdpConfiguration end...");
 		return configuration;
+	}
+	
+	public String getDefaultSPLocation(){
+		return this.saml2Properties.getDefaultSpLocation();
 	}
 }

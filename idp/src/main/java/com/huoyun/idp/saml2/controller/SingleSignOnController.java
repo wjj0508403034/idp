@@ -221,7 +221,7 @@ public class SingleSignOnController {
 		
 		List<String> list = new ArrayList<>();
 		list.add("123456");
-		attributes.put("tenantId", list);
+		attributes.put("tenantCode", list);
 
 		addSessionIndexInLandscape(httpRequest, m, idpSession);
 

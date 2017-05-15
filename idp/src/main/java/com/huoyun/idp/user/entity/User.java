@@ -5,9 +5,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.huoyun.idp.common.AbstractBusinessObject;
+import com.huoyun.idp.tenant.Tenant;
 
 @Entity
 @Table
@@ -39,6 +42,10 @@ public class User extends AbstractBusinessObject {
 
 	@Column
 	private Role role;
+
+	@ManyToOne
+	@JoinColumn
+	private Tenant tenant;
 
 	@Override
 	public Long getId() {
@@ -103,6 +110,22 @@ public class User extends AbstractBusinessObject {
 
 	public void setRole(Role role) {
 		this.role = role;
+	}
+
+	public Tenant getTenant() {
+		return tenant;
+	}
+
+	public void setTenant(Tenant tenant) {
+		this.tenant = tenant;
+	}
+
+	public Boolean getLocked() {
+		return locked;
+	}
+
+	public Boolean getActive() {
+		return active;
 	}
 
 }

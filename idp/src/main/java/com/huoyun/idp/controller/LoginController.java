@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.huoyun.idp.common.BusinessException;
 import com.huoyun.idp.common.Facade;
 import com.huoyun.idp.controller.login.LoginParam;
+import com.huoyun.idp.exception.BusinessException;
 import com.huoyun.idp.user.UserInfo;
 
 @Controller

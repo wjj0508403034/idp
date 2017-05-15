@@ -1,8 +1,8 @@
 package com.huoyun.idp.user;
 
-import com.huoyun.idp.common.BusinessException;
 import com.huoyun.idp.controller.login.LoginData;
 import com.huoyun.idp.controller.login.LoginParam;
+import com.huoyun.idp.exception.BusinessException;
 import com.huoyun.idp.user.entity.User;
 
 public interface UserService {
@@ -14,4 +14,6 @@ public interface UserService {
 	User getUserByName(String username);
 	
 	void createUser(User user);
+	
+	void changePassword(Long userId,String oldPassword,String newPassword) throws BusinessException;
 }

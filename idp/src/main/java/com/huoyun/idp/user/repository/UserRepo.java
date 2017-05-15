@@ -12,6 +12,9 @@ public interface UserRepo extends PagingAndSortingRepository<User,Long> {
 	@Query("select t from User t where t.email = ?1")
 	User getUserByEmail(String email);
 	
+	@Query("select t from User t where t.id = ?1")
+	User getUserById(Long userId);
+	
 	@Query("select t from User t where t.phone = ?1")
 	User getUserByPhone(String phone);
 }

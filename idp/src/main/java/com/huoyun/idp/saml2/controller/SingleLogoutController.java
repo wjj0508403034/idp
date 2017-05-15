@@ -23,8 +23,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.huoyun.idp.common.BusinessException;
 import com.huoyun.idp.constants.EndpointsConstants;
+import com.huoyun.idp.exception.BusinessException;
 import com.huoyun.idp.saml2.SAML2Constants;
 import com.huoyun.idp.saml2.configuration.SAML2IdPConfigurationFactory;
 import com.huoyun.idp.saml2.slo.SingleLogoutService;

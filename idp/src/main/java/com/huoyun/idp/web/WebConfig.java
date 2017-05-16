@@ -1,6 +1,8 @@
 package com.huoyun.idp.web;
 
+import java.util.ArrayList;
 import java.util.EventListener;
+import java.util.List;
 
 import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.boot.context.embedded.ServletListenerRegistrationBean;
@@ -14,6 +16,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
+import com.huoyun.idp.common.Facade;
+import com.huoyun.idp.internal.api.InternalApiAuthenticationFilter;
 import com.huoyun.idp.redis.RedisSessionRepositoryFilter;
 
 @Configuration
@@ -43,6 +47,21 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 	public ServletListenerRegistrationBean<EventListener> getHttpSessionListener() {
 		ServletListenerRegistrationBean<EventListener> registrationBean = new ServletListenerRegistrationBean<>();
 		registrationBean.setListener(new HttpSessionEventPublisher());
+		return registrationBean;
+	}
+	
+	@Bean
+	public FilterRegistrationBean loginRequiredFilter(
+			Facade facade) {
+		InternalApiAuthenticationFilter filter = new InternalApiAuthenticationFilter();
+		filter.setFacade(facade);
+		FilterRegistrationBean registrationBean = new FilterRegistrationBean();
+		registrationBean.setFilter(filter);
+		List<String> urlPatterns = new ArrayList<String>();
+		urlPatterns.add("/api/*");
+		registrationBean.setUrlPatterns(urlPatterns);
+		registrationBean.setName("InternalApiFilter");
+		registrationBean.setOrder(1);
 		return registrationBean;
 	}
 

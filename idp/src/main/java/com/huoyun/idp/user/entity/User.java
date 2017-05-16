@@ -9,6 +9,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.joda.time.DateTime;
+
 import com.huoyun.idp.common.AbstractBusinessObject;
 import com.huoyun.idp.tenant.Tenant;
 
@@ -29,16 +31,22 @@ public class User extends AbstractBusinessObject {
 	private String phone;
 
 	@Column
-	private Boolean locked;
+	private String userName;
+
+	@Column
+	private boolean locked;
 
 	@Column
 	private String password;
 
 	@Column
-	private Boolean active;
+	private boolean active;
 
 	@Column
 	private String activeCode;
+
+	@Column
+	private DateTime activeDate;
 
 	@Column
 	private Role role;
@@ -88,11 +96,11 @@ public class User extends AbstractBusinessObject {
 		this.password = password;
 	}
 
-	public Boolean isActive() {
+	public boolean isActive() {
 		return active;
 	}
 
-	public void setActive(Boolean active) {
+	public void setActive(boolean active) {
 		this.active = active;
 	}
 
@@ -120,12 +128,32 @@ public class User extends AbstractBusinessObject {
 		this.tenant = tenant;
 	}
 
-	public Boolean getLocked() {
+	public boolean getLocked() {
 		return locked;
 	}
 
-	public Boolean getActive() {
+	public boolean getActive() {
 		return active;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public DateTime getActiveDate() {
+		return activeDate;
+	}
+
+	public void setActiveDate(DateTime activeDate) {
+		this.activeDate = activeDate;
+	}
+
+	public void setLocked(boolean locked) {
+		this.locked = locked;
 	}
 
 }

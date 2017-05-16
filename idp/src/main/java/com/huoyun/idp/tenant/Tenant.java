@@ -24,6 +24,9 @@ public class Tenant extends AbstractBusinessObject {
 
 	@Column
 	private String name;
+	
+	@Column
+	private String email;
 
 	@Override
 	public Long getId() {
@@ -48,6 +51,14 @@ public class Tenant extends AbstractBusinessObject {
 
 	public void setTenantCode(String tenantCode) {
 		this.tenantCode = tenantCode;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 }

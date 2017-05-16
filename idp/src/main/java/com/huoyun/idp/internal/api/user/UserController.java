@@ -1,4 +1,4 @@
-package com.huoyun.idp.common.api.user;
+package com.huoyun.idp.internal.api.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,7 +11,7 @@ import com.huoyun.idp.exception.BusinessException;
 import com.huoyun.idp.user.UserService;
 
 @Controller
-@RequestMapping("/api/users/")
+@RequestMapping("/api/users")
 public class UserController {
 
 	@Autowired

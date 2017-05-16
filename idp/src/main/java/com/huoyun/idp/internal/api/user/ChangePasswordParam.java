@@ -1,4 +1,4 @@
-package com.huoyun.idp.common.api.user;
+package com.huoyun.idp.internal.api.user;
 
 public class ChangePasswordParam {
 

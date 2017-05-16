@@ -23,9 +23,13 @@ import com.huoyun.idp.tenant.Tenant;
 import com.huoyun.idp.tenant.repository.TenantRepo;
 import com.huoyun.idp.user.UserErrorCodes;
 import com.huoyun.idp.user.UserService;
+import com.huoyun.idp.user.entity.ForgetPasswordHistory;
 import com.huoyun.idp.user.entity.User;
+import com.huoyun.idp.user.repository.ForgetPasswordHistoryRepo;
 import com.huoyun.idp.user.repository.UserRepo;
+import com.huoyun.idp.view.user.ForgetPasswordParam;
 import com.huoyun.idp.view.user.InitPasswordParam;
+import com.huoyun.idp.view.user.ResetPasswordParam;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -53,12 +57,6 @@ public class UserServiceImpl implements UserService {
 		}
 
 		return null;
-	}
-
-	@Override
-	public void checkBeforeLogin(String username) throws BusinessException {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -96,7 +94,7 @@ public class UserServiceImpl implements UserService {
 			throw new BusinessException(UserErrorCodes.Create_User_Failed_Due_To_Tenant_Not_Exists);
 		}
 
-		this.checkUserExists(createUserParam.getEmail());
+		this.checkUserExistsBeforeCreate(createUserParam.getEmail());
 
 		User user = new User();
 		user.setTenant(tenant);
@@ -109,7 +107,7 @@ public class UserServiceImpl implements UserService {
 	@Transactional(rollbackFor = BusinessException.class)
 	@Override
 	public void createUser(Tenant tenant, CreateTenantParam tenantParam) throws BusinessException {
-		this.checkUserExists(tenantParam.getEmail());
+		this.checkUserExistsBeforeCreate(tenantParam.getEmail());
 
 		User user = new User();
 		user.setTenant(tenant);
@@ -145,7 +143,62 @@ public class UserServiceImpl implements UserService {
 		this.facade.getService(UserRepo.class).save(user);
 	}
 
-	private void checkUserExists(String email) throws BusinessException {
+	@Transactional(rollbackFor = BusinessException.class)
+	@Override
+	public void requestForgetPassword(ForgetPasswordParam forgetPasswordParam) throws BusinessException {
+		User user = this.facade.getService(UserRepo.class).getUserByEmail(forgetPasswordParam.getEmail());
+		if (user == null) {
+			throw new BusinessException(UserErrorCodes.User_Not_Exists);
+		}
+
+		this.facade.getService(ForgetPasswordHistoryRepo.class).deactiveRequests(user);
+		ForgetPasswordHistory history = new ForgetPasswordHistory();
+		history.setUser(user);
+		history.setRequestCode(UUID.randomUUID().toString());
+		history.setRequestDate(DateTime.now());
+
+		this.facade.getService(ForgetPasswordHistoryRepo.class).save(history);
+
+		EmailTemplate template = new EmailTemplateImpl(EmailTemplateNames.User_Request_Change_Password);
+		template.setVariable("user", user);
+		template.setVariable("history", history);
+		template.setVariable("link", "http://localhost:8080/forgetPassword.html");
+		this.facade.getService(EmailService.class).send(user.getEmail(), template);
+	}
+
+	@Override
+	public void verifyChangePasswordRequestCode(String requestCode) throws BusinessException {
+		ForgetPasswordHistory history = this.facade.getService(ForgetPasswordHistoryRepo.class)
+				.getHistoryByRequestCode(requestCode);
+		if (history == null) {
+			throw new BusinessException(UserErrorCodes.Change_Password_Request_Code_Not_Exists);
+		}
+
+		if (!history.isActive()) {
+			throw new BusinessException(UserErrorCodes.Change_Password_Request_Code_Invalid);
+		}
+
+		if (history.getRequestDate().plusDays(1).isBeforeNow()) {
+			throw new BusinessException(UserErrorCodes.Change_Password_Request_Code_Is_Expired);
+		}
+
+	}
+
+	@Transactional(rollbackFor = BusinessException.class)
+	@Override
+	public void resetPassword(ResetPasswordParam resetPasswordParam) throws BusinessException {
+		this.verifyChangePasswordRequestCode(resetPasswordParam.getRequestCode());
+
+		ForgetPasswordHistory history = this.facade.getService(ForgetPasswordHistoryRepo.class)
+				.getHistoryByRequestCode(resetPasswordParam.getRequestCode());
+		history.setActive(false);
+		this.facade.getService(ForgetPasswordHistoryRepo.class).save(history);
+		User user = history.getUser();
+		user.setPassword(resetPasswordParam.getPassword());
+		this.facade.getService(UserRepo.class).save(user);
+	}
+
+	private void checkUserExistsBeforeCreate(String email) throws BusinessException {
 		boolean userExists = this.facade.getService(UserRepo.class).exists(email);
 		if (userExists) {
 			throw new BusinessException(UserErrorCodes.Create_User_Failed_Due_To_User_Exists);

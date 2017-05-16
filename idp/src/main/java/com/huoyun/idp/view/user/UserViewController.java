@@ -21,7 +21,10 @@ import com.huoyun.idp.user.UserService;
 @RequestMapping
 public class UserViewController {
 	private static final String View_Name_Init_Password = "/view/init_password";
+	private static final String View_Name_Forget_Password = "/view/forget_password";
+	private static final String View_Name_Forget_Password_Info = "/view/forget_password_send_mail_success";
 	private static final String View_Name_General_Error = "/view/general_error";
+	private static final String View_Name_Change_Password = "/view/change_password";
 
 	private static Logger LOGGER = LoggerFactory.getLogger(UserViewController.class);
 
@@ -56,17 +59,17 @@ public class UserViewController {
 		model.addAttribute("errors", errors);
 
 		if (StringUtils.isEmpty(initPasswordForm.getPassword())) {
-			errors.put("password", InitPasswordErrorCodes.Init_Password_Password_IsEmpty);
+			errors.put("password", UserViewErrorCodes.Init_Password_Password_IsEmpty);
 			return View_Name_Init_Password;
 		}
 
 		if (StringUtils.isEmpty(initPasswordForm.getRepeatPassword())) {
-			errors.put("repeatPassword", InitPasswordErrorCodes.Init_Password_Repeat_Password_IsEmpty);
+			errors.put("repeatPassword", UserViewErrorCodes.Init_Password_Repeat_Password_IsEmpty);
 			return View_Name_Init_Password;
 		}
 
 		if (!StringUtils.equals(initPasswordForm.getPassword(), initPasswordForm.getRepeatPassword())) {
-			errors.put("repeatPassword", InitPasswordErrorCodes.Init_Password_Password_NotMatch);
+			errors.put("repeatPassword", UserViewErrorCodes.Init_Password_Password_NotMatch);
 			return View_Name_Init_Password;
 		}
 
@@ -81,4 +84,86 @@ public class UserViewController {
 
 		return "redirect: /saml2/idp/sso";
 	}
+
+	@RequestMapping(value = "/forgetPassword.html", method = RequestMethod.GET)
+	public String forgetPasswordPage(Model model) {
+		model.addAttribute("forgetPasswordParam", new ForgetPasswordParam());
+		return View_Name_Forget_Password;
+	}
+
+	@RequestMapping(value = "/requestForgetPassword", method = RequestMethod.POST)
+	public String requestForgetPassword(ForgetPasswordParam forgetPasswordParam, Model model) {
+		Map<String, String> errors = new HashMap<>();
+		model.addAttribute("errors", errors);
+
+		if (StringUtils.isEmpty(forgetPasswordParam.getEmail())) {
+			errors.put("email", UserViewErrorCodes.Forget_Password_Email_IsEmpty);
+			return View_Name_Forget_Password;
+		}
+
+		try {
+			this.userService.requestForgetPassword(forgetPasswordParam);
+		} catch (BusinessException ex) {
+			LOGGER.error("Request forget password failed.", ex);
+			String errorMessage = localService.getErrorMessage(ex.getCode());
+			errors.put("email", errorMessage);
+			return View_Name_Forget_Password;
+		}
+
+		model.addAttribute("email", forgetPasswordParam.getEmail());
+		return View_Name_Forget_Password_Info;
+	}
+
+	@RequestMapping(value = "/resetPassword.html", method = RequestMethod.GET)
+	public String resetPasswordPage(@RequestParam(name = "requestCode", required = false) String requestCode,
+			Model model) {
+		try {
+			this.userService.verifyChangePasswordRequestCode(requestCode);
+		} catch (BusinessException ex) {
+			LOGGER.error("Verify change password request code failed.", ex);
+			String errorMessage = localService.getErrorMessage(ex.getCode());
+			model.addAttribute("errorMessage", errorMessage);
+
+			return View_Name_General_Error;
+		}
+
+		ResetPasswordParam param = new ResetPasswordParam();
+		param.setRequestCode(requestCode);
+		model.addAttribute("resetPasswordParam", param);
+		return View_Name_Change_Password;
+	}
+
+	@RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
+	public String resetPassword(ResetPasswordParam resetPasswordParam, Model model) {
+		Map<String, String> errors = new HashMap<>();
+		model.addAttribute("errors", errors);
+
+		if (StringUtils.isEmpty(resetPasswordParam.getPassword())) {
+			errors.put("password", UserViewErrorCodes.Change_Password_Password_IsEmpty);
+			return View_Name_Change_Password;
+		}
+
+		if (StringUtils.isEmpty(resetPasswordParam.getRepeatPassword())) {
+			errors.put("repeatPassword", UserViewErrorCodes.Change_Password_Repeat_Password_IsEmpty);
+			return View_Name_Change_Password;
+		}
+
+		if (!StringUtils.equals(resetPasswordParam.getPassword(), resetPasswordParam.getRepeatPassword())) {
+			errors.put("repeatPassword", UserViewErrorCodes.Change_Password_Password_NotMatch);
+			return View_Name_Change_Password;
+		}
+
+		try {
+			this.userService.resetPassword(resetPasswordParam);
+		} catch (BusinessException ex) {
+			LOGGER.error("Reset password failed.", ex);
+			String errorMessage = localService.getErrorMessage(ex.getCode());
+			model.addAttribute("errorMessage", errorMessage);
+
+			return View_Name_Change_Password;
+		}
+
+		return "redirect: /saml2/idp/sso";
+	}
+
 }

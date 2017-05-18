@@ -13,12 +13,13 @@ public class EmailAutoConfiguration {
 
 	@Bean
 	public EmailService emailService(SmtpProperties smtp, LocaleService localeService) {
-		return new EmailServiceImpl(emailTemplateEngine(), smtp, localeService);
+		return new EmailServiceImpl(emailTemplateEngine(localeService), smtp, localeService);
 	}
 
-	private SpringTemplateEngine emailTemplateEngine() {
+	private SpringTemplateEngine emailTemplateEngine(LocaleService localeService) {
 		SpringTemplateEngine templateEngine = new SpringTemplateEngine();
 		templateEngine.addTemplateResolver(emailTemplateResolver());
+		templateEngine.setTemplateEngineMessageSource(localeService.getMessageSource());;
 		return templateEngine;
 	}
 

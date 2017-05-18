@@ -27,6 +27,11 @@ public class LocaleServiceImpl implements LocaleService {
 		}
 		return null;
 	}
+	
+	@Override
+	public MessageSource getMessageSource(){
+		return this.messageSource;
+	}
 
 	@Override
 	public String getMessage(String key, Object[] objs) {

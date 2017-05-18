@@ -3,6 +3,7 @@ package com.huoyun.idp.email.impl;
 import java.util.Date;
 import java.util.Properties;
 
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang.StringUtils;
@@ -43,9 +44,11 @@ public class EmailServiceImpl implements EmailService {
 			LOGGER.info("Start to sending mail ...");
 			JavaMailSenderImpl sender = this.getMailSender();
 			MimeMessage message = sender.createMimeMessage();
-			MimeMessageHelper helper = new MimeMessageHelper(message);
+			MimeMessageHelper helper = new MimeMessageHelper(message,EmailConstants.UTF_8);
 			helper.setSentDate(new Date());
-			helper.setFrom(this.smtp.getFrom());
+			InternetAddress from = new InternetAddress(this.smtp.getFrom());
+			from.setPersonal(this.smtp.getFromDisplayName(), EmailConstants.UTF_8);
+			helper.setFrom(from);
 			helper.setTo(to);
 			helper.setSubject(template.getSubject(this.localeService));
 			helper.setText(template.getHtml(this.templateEngine), true);

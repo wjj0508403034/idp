@@ -11,4 +11,5 @@ public class UserErrorCodes {
 	public static final String Change_Password_Request_Code_Not_Exists = "10008";
 	public static final String Change_Password_Request_Code_Is_Expired = "10009";
 	public static final String Change_Password_Request_Code_Invalid = "10010";
+	public static final String IDP_Domain_Is_Empty = "10011";
 }

@@ -12,6 +12,7 @@ public class SmtpProperties {
 	private String userName;
 	private String password;
 	private String from;
+	private String fromDisplayName;
 
 	public String getServer() {
 		return server;
@@ -51,6 +52,14 @@ public class SmtpProperties {
 
 	public void setFrom(String from) {
 		this.from = from;
+	}
+
+	public String getFromDisplayName() {
+		return fromDisplayName;
+	}
+
+	public void setFromDisplayName(String fromDisplayName) {
+		this.fromDisplayName = fromDisplayName;
 	}
 
 }

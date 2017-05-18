@@ -13,6 +13,8 @@ import com.huoyun.idp.common.ErrorCode;
 import com.huoyun.idp.common.Facade;
 import com.huoyun.idp.controller.login.LoginData;
 import com.huoyun.idp.controller.login.LoginParam;
+import com.huoyun.idp.domains.Domain;
+import com.huoyun.idp.domains.DomainService;
 import com.huoyun.idp.email.EmailService;
 import com.huoyun.idp.email.EmailTemplate;
 import com.huoyun.idp.email.EmailTemplateNames;
@@ -33,6 +35,8 @@ import com.huoyun.idp.view.user.ResetPasswordParam;
 
 @Service
 public class UserServiceImpl implements UserService {
+
+	private static final String IDP = "IDP";
 
 	@Autowired
 	private Facade facade;
@@ -159,10 +163,12 @@ public class UserServiceImpl implements UserService {
 
 		this.facade.getService(ForgetPasswordHistoryRepo.class).save(history);
 
+		String forgetPasswordLink = this.combinePath(this.getIDPDomain(),
+				"resetPassword.html?requestCode=" + history.getRequestCode());
 		EmailTemplate template = new EmailTemplateImpl(EmailTemplateNames.User_Request_Change_Password);
 		template.setVariable("user", user);
 		template.setVariable("history", history);
-		template.setVariable("link", "http://localhost:8080/forgetPassword.html");
+		template.setVariable("link", forgetPasswordLink);
 		this.facade.getService(EmailService.class).send(user.getEmail(), template);
 	}
 
@@ -210,10 +216,37 @@ public class UserServiceImpl implements UserService {
 		user.setActiveDate(DateTime.now());
 		this.facade.getService(UserRepo.class).save(user);
 
+		String activeLink = this.combinePath(this.getIDPDomain(), "initPassword.html?activeCode=" + user.getActiveCode());
+
 		EmailTemplate template = new EmailTemplateImpl(EmailTemplateNames.User_Set_Init_Password);
 		template.setVariable("user", user);
-		template.setVariable("link", "http://localhost:8080/setPassword");
+		template.setVariable("link", activeLink);
 		this.facade.getService(EmailService.class).send(user.getEmail(), template);
+	}
+
+	private String getIDPDomain() throws BusinessException {
+		Domain domain = this.facade.getService(DomainService.class).getDomainByName(IDP);
+		if (domain == null) {
+			throw new BusinessException(UserErrorCodes.IDP_Domain_Is_Empty);
+		}
+
+		return domain.getUrl();
+	}
+
+	private String combinePath(String firstPath, String secondPath) {
+		StringBuilder builder = new StringBuilder();
+		builder.append(firstPath);
+		if (!StringUtils.endsWith(firstPath, "/")) {
+			builder.append("/");
+		}
+
+		if (StringUtils.startsWith(secondPath, "/")) {
+			builder.append(secondPath.substring(1));
+		} else {
+			builder.append(secondPath);
+		}
+
+		return builder.toString();
 	}
 
 }

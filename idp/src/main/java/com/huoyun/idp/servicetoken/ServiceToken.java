@@ -21,6 +21,9 @@ public class ServiceToken extends AbstractBusinessObject {
 
 	@Column(unique = true)
 	private String name;
+	
+	@Column
+	private String dbName;
 
 	@Column
 	private String token;
@@ -48,5 +51,13 @@ public class ServiceToken extends AbstractBusinessObject {
 
 	public void setToken(String token) {
 		this.token = token;
+	}
+
+	public String getDbName() {
+		return dbName;
+	}
+
+	public void setDbName(String dbName) {
+		this.dbName = dbName;
 	}
 }

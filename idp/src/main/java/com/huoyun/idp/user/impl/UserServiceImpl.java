@@ -11,8 +11,6 @@ import org.thymeleaf.util.StringUtils;
 import com.huoyun.idp.admin.tenant.CreateTenantParam;
 import com.huoyun.idp.common.ErrorCode;
 import com.huoyun.idp.common.Facade;
-import com.huoyun.idp.controller.login.LoginData;
-import com.huoyun.idp.controller.login.LoginParam;
 import com.huoyun.idp.domains.Domain;
 import com.huoyun.idp.domains.DomainService;
 import com.huoyun.idp.email.EmailService;
@@ -42,28 +40,6 @@ public class UserServiceImpl implements UserService {
 	private Facade facade;
 
 	@Override
-	public LoginData login(LoginParam loginParam) throws BusinessException {
-		User user = this.facade.getService(UserRepo.class).getUserByEmail(loginParam.getEmail());
-		if (user == null) {
-			throw new BusinessException(ErrorCode.User_Not_Exists);
-		}
-
-		if (StringUtils.equals(loginParam.getPassword(), user.getPassword())) {
-			throw new BusinessException(ErrorCode.User_Login_Password_Invalid);
-		}
-
-		if (!user.isActive()) {
-			throw new BusinessException(ErrorCode.User_Not_Active);
-		}
-
-		if (!user.isLocked()) {
-			throw new BusinessException(ErrorCode.User_Locked);
-		}
-
-		return null;
-	}
-
-	@Override
 	public User getUserByName(String username) {
 		return this.facade.getService(UserRepo.class).getUserByEmail(username);
 	}
@@ -90,6 +66,10 @@ public class UserServiceImpl implements UserService {
 		this.facade.getService(UserRepo.class).save(user);
 	}
 
+	/*
+	 * For internal api call
+	 * @see com.huoyun.idp.user.UserService#createUser(com.huoyun.idp.internal.api.user.CreateUserParam)
+	 */
 	@Transactional(rollbackFor = BusinessException.class)
 	@Override
 	public void createUser(CreateUserParam createUserParam) throws BusinessException {
@@ -105,12 +85,16 @@ public class UserServiceImpl implements UserService {
 		user.setEmail(createUserParam.getEmail());
 		user.setUserName(createUserParam.getUserName());
 		user.setPhone(createUserParam.getPhone());
-		this.createUserAndSendEmail(user);
+		user.setActiveCode(UUID.randomUUID().toString());
+		user.setActiveDate(DateTime.now());
+		this.facade.getService(UserRepo.class).save(user);
+		
+		this.sendUserInitPasswordMail(user);
 	}
 
 	@Transactional(rollbackFor = BusinessException.class)
 	@Override
-	public void createUser(Tenant tenant, CreateTenantParam tenantParam) throws BusinessException {
+	public User createUser(Tenant tenant, CreateTenantParam tenantParam) throws BusinessException {
 		this.checkUserExistsBeforeCreate(tenantParam.getEmail());
 
 		User user = new User();
@@ -118,7 +102,9 @@ public class UserServiceImpl implements UserService {
 		user.setEmail(tenantParam.getEmail());
 		user.setPhone(tenantParam.getPhone());
 		user.setUserName(tenantParam.getUserName());
-		this.createUserAndSendEmail(user);
+		user.setActiveCode(UUID.randomUUID().toString());
+		user.setActiveDate(DateTime.now());
+		return this.facade.getService(UserRepo.class).save(user);
 	}
 
 	@Override
@@ -203,25 +189,22 @@ public class UserServiceImpl implements UserService {
 		user.setPassword(resetPasswordParam.getPassword());
 		this.facade.getService(UserRepo.class).save(user);
 	}
+	
+
+	@Override
+	public void sendUserInitPasswordMail(User user) throws BusinessException {
+		String activeLink = this.combinePath(this.getIDPDomain(), "initPassword.html?activeCode=" + user.getActiveCode());
+		EmailTemplate template = new EmailTemplateImpl(EmailTemplateNames.User_Set_Init_Password);
+		template.setVariable("user", user);
+		template.setVariable("link", activeLink);
+		this.facade.getService(EmailService.class).send(user.getEmail(), template);
+	}
 
 	private void checkUserExistsBeforeCreate(String email) throws BusinessException {
 		boolean userExists = this.facade.getService(UserRepo.class).exists(email);
 		if (userExists) {
 			throw new BusinessException(UserErrorCodes.Create_User_Failed_Due_To_User_Exists);
 		}
-	}
-
-	private void createUserAndSendEmail(User user) throws BusinessException {
-		user.setActiveCode(UUID.randomUUID().toString());
-		user.setActiveDate(DateTime.now());
-		this.facade.getService(UserRepo.class).save(user);
-
-		String activeLink = this.combinePath(this.getIDPDomain(), "initPassword.html?activeCode=" + user.getActiveCode());
-
-		EmailTemplate template = new EmailTemplateImpl(EmailTemplateNames.User_Set_Init_Password);
-		template.setVariable("user", user);
-		template.setVariable("link", activeLink);
-		this.facade.getService(EmailService.class).send(user.getEmail(), template);
 	}
 
 	private String getIDPDomain() throws BusinessException {
@@ -248,5 +231,6 @@ public class UserServiceImpl implements UserService {
 
 		return builder.toString();
 	}
+
 
 }

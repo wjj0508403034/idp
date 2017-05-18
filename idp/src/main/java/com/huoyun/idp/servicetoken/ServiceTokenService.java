@@ -5,4 +5,6 @@ public interface ServiceTokenService {
 	boolean isValid(String name, String token);
 
 	ServiceToken generateToken(String name);
+	
+	ServiceToken getServiceToken(String name);
 }

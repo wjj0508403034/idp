@@ -11,4 +11,7 @@ public interface ServiceTokenRepo extends PagingAndSortingRepository<ServiceToke
 
 	@Query("select count(t) > 0 from ServiceToken t where t.name = ?1 and t.token = ?2")
 	boolean isValid(String name, String token);
+	
+	@Query("select t from ServiceToken t where t.name = ?1")
+	ServiceToken getServiceTokenByName(String name);
 }

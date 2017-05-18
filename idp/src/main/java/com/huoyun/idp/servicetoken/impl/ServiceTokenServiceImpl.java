@@ -31,4 +31,9 @@ public class ServiceTokenServiceImpl implements ServiceTokenService {
 		return this.facade.getService(ServiceTokenRepo.class).save(token);
 	}
 
+	@Override
+	public ServiceToken getServiceToken(String name) {
+		return this.facade.getService(ServiceTokenRepo.class).getServiceTokenByName(name);
+	}
+
 }

@@ -7,32 +7,143 @@
   <meta charset="UTF-8" />
   <title>登录</title>
   <link rel="stylesheet" th:href="@{/libs/bootstrap.min.css}"></link>
+  <link rel="stylesheet" th:href="@{/libs/font-awesome.min.css}"></link>
+   <link rel="stylesheet" th:href="@{/libs/style.css}"></link>
+  <link rel="stylesheet" th:href="@{/libs/flexslider.css}"></link>
+  <link rel="stylesheet" th:href="@{/libs/owl.carousel.css}"></link>
+  <link rel="stylesheet" th:href="@{/libs/magnific-popup.css}"></link>
   <link rel="stylesheet" th:href="@{/css/login.css}"></link>
 </head>
 
-<body>
-  <div class="container-wrap">
-    <form class="login-form" role="form" action="/saml2/idp/login" method="post">
-      <div class="form-group">
-        <label for="username" class="control-label">用户名</label>
-        <input type="text" class="form-control" id="username" name="username" placeholder="用户名" />
-        <div class="err-tip" th:if="${errors != null and errors.containsKey('username')}" th:text="#{${errors.username}}"></div>
-      </div>
-      <div class="form-group">
-        <label for="password" class="control-label">密码</label>
-        <input type="password" class="form-control" id="password" name="password" placeholder="输入密码" />
-        <div class="err-tip" th:if="${errors != null and errors.containsKey('password')}" th:text="#{${errors.password}}"></div>
-      </div>
-      <div class="form-group">
-        <a class="login-question" href="#">忘记密码</a>
-      </div>
-      <input name="SAMLRequest" type="hidden" th:value="${SAMLRequest}" />
-      <input name="RelayState" type="hidden" th:value="${RelayState}" />
-      <div class="form-group">
-        <button type="submit" class="btn btn-default login-button">登录</button>
-      </div>
-    </form>
-  </div>
-</body>
+<body>		
+	<!--  Header & Menu  -->
+    <header id="header">
+        <div class="top-nav">
+            <!--  Header Logo  -->
+            <div id="logo">
+                <a class="navbar-brand" href="index.html">
+                    <img th:src="@{/images/logo.png}" class="normal" alt="logo">
+                    <img th:src="@{/images/logo@2x.png}" class="retina" alt="logo">
+                </a>
+            </div>
+            <!--  END Header Logo  -->
+            <div class="secondary-menu">
+                    <!--<li class="phone"><i class="fa fa-phone" aria-hidden="true"></i>18751891885</li>-->
+                    <!-- Search Icon -->
+                    <button type="button" class="freeUser btn btn-default btn-sm">
+                        <i class="fa fa-handshake-o"></i>免费体验
+                    </button>
+                    <button type="button" class="login btn btn-success btn-sm">
+                        <i class="fa fa-user-circle"></i>登录
+                    </button>
+            </div>
+        </div>
+        <nav class="navbar navbar-default">
+            <!--  Classic menu, responsive menu classic  -->
+            <div id="menu-classic">
+                <div class="menu-holder">
+                    <ul>
+                        <li><a href="index.html">主页</a></li>
+                        <li><a href="services.html">产品与服务</a></li>
+                        <li><a href="about.html">关于我们</a></li>
+                        <li><a href="contact.html">联系我们</a></li>
+                    </ul>
+                </div>
+            </div>
+            <!--  END Classic menu, responsive menu classic  -->
+            <!--  Button for Responsive Menu Classic  -->
+            <div id="menu-responsive-classic">
+                <div class="menu-button">
+                    <span class="bar bar-1"></span>
+                    <span class="bar bar-2"></span>
+                    <span class="bar bar-3"></span>
+                </div>
+            </div>
+            <!--  END Button for Responsive Menu Classic  -->
+            <div class="secondary-menu-mobile">
+                <ul>
+                    <li class="mail"><i class="fa fa-envelope" aria-hidden="true"></i><a href="maito:info@domain.com">info@domain.com</a></li>
+                    <li class="phone"><i class="fa fa-phone" aria-hidden="true"></i>+39 123456789</li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+     <!--  Main Wrap  -->
+    <div id="main-wrap">
+    	<div class="container container-wrap">
+    		 <form class="login-form" role="form" action="/saml2/idp/login" method="post">
+    		 	 <div class="form-title-tip form-group">
+			     	<div class="step-tip color-gray login-tip">登录</div>
+			     </div>
+			      <div class="form-group">
+			        <label for="username" class="control-label">用户名</label>
+			        <input type="text" class="form-control" id="username" name="username" placeholder="用户名" />
+			        <div class="err-tip" th:if="${errors != null and errors.containsKey('username')}" th:text="#{${errors.username}}"></div>
+			      </div>
+			      <div class="form-group">
+			        <label for="password" class="control-label">密码</label>
+			        <input type="password" class="form-control" id="password" name="password" placeholder="输入密码" />
+			        <div class="err-tip" th:if="${errors != null and errors.containsKey('password')}" th:text="#{${errors.password}}"></div>
+			      </div>
+			      <div class="form-group">
+			        <a class="login-question" href="#">忘记密码</a>
+			      </div>
+			      <input name="SAMLRequest" type="hidden" th:value="${SAMLRequest}" />
+			      <input name="RelayState" type="hidden" th:value="${RelayState}" />
+			      <div class="form-group">
+			        <button type="submit" class="btn btn-default login-button">登录</button>
+			      </div>
+			    </form>
+		</div>
+    </div>
 
+ <!--  Footer  -->
+    <footer>
+        <div class="container">
+            <div class="row no-margin">
+                <div class="col-md-5 text">
+                    <p>   专注中小装修企业的销售管理系统， 从装修企业实际需求开展，围绕客户展开线索-客户跟踪-消化跟踪-合同管理等业务活动，帮助装修人员提高业绩</p>
+                </div>
+                <div class="col-md-4 text small">
+                    <h4 class="heading white margin-bottom-small weight-300">装企翼</h4>
+                    <p>公司地址<br>南京市浦口区星甸街道育才北路B-10号</p>
+                    <p>服务电话<br>18751891885</p>
+                </div>
+                <div class="col-md-3 text small">
+                    <h4 class="heading white margin-bottom-small weight-300">快速导航</h4>
+                    <ul class="info">
+                        <li><a href="services.html">产品及服务</a></li>
+                        <li><a href="services.html">关于我们</a></li>
+                        <li><a href="contact.html">申请试用</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <div id="copy">
+        <div class="container">
+            <div class="row no-margin">
+                <div class="col-md-6 text">
+                    <p>Copyright &copy; 2017.Company fccfc.com All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--  END Footer. Class fixed for fixed footer  -->
+</body>
+  <script th:src="@{/libs/js/jquery/jquery.min.js}"></script>
+  <script th:src="@{/libs/js/bootstrap/bootstrap.min.js}"></script>
+  <script th:src="@{/libs/js/jquery/jquery.flexslider-min.js}"></script>
+  <script th:src="@{/libs/js/jquery/owl.carousel.min.js}"></script>
+  <script th:src="@{/libs/js/isotope.min.js}"></script>
+  <script th:src="@{/libs/js/jquery/jquery.magnific-popup.min.js}"></script>
+  <script th:src="@{/libs/js/jquery.scrollTo.min.js}"></script>
+  <script th:src="@{/libs/js/smooth.scroll.min.js}"></script>
+  <script th:src="@{/libs/js/jquery.appear.js}"></script>
+  <script th:src="@{/libs/js/jquery.countTo.js}"></script>
+  <script th:src="@{/libs/js/jquery.scrolly.js}"></script>
+  <script th:src="@{/libs/js/plugins-scroll.js}"></script>
+  <script th:src="@{/libs/js/imagesloaded.min.js}"></script>
+  <script th:src="@{/libs/js/pace.min.js}"></script>
+  <script th:src="@{/libs/js/main.js}"></script>
 </html>

@@ -25,7 +25,7 @@ public class EmailAutoConfiguration {
 
 	private ClassLoaderTemplateResolver emailTemplateResolver() {
 		ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
-		templateResolver.setPrefix("EMAIL-TEMPLATES/");
+		templateResolver.setPrefix("classpath:/EMAIL-TEMPLATES");
 		templateResolver.setTemplateMode("LEGACYHTML5");
 		templateResolver.setSuffix(".html");
 		templateResolver.setOrder(1);

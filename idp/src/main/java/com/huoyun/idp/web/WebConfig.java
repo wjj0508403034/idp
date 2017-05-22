@@ -75,7 +75,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 
 	private ClassLoaderTemplateResolver htmlTemplateResolver() {
 		ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
-		templateResolver.setPrefix("templates/");
+		templateResolver.setPrefix("classpath:/templates");
 		templateResolver.setTemplateMode("LEGACYHTML5");
 		templateResolver.setSuffix(".html");
 		templateResolver.setOrder(1);

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.huoyun.idp.exception.BusinessException;
 import com.huoyun.idp.user.UserService;
+import com.huoyun.idp.user.entity.User;
 
 @Controller
 @RequestMapping("/api/users")
@@ -19,14 +20,25 @@ public class UserController {
 
 	@RequestMapping(method = RequestMethod.POST, value = "/changePassword")
 	@ResponseBody
-	public void changePassword(@RequestBody ChangePasswordParam changePasswordParam) throws BusinessException {
-		this.userService.changePassword(changePasswordParam.getUserId(), changePasswordParam.getOldPassword(),
+	public void changePassword(
+			@RequestBody ChangePasswordParam changePasswordParam)
+			throws BusinessException {
+		this.userService.changePassword(changePasswordParam.getUserId(),
+				changePasswordParam.getOldPassword(),
 				changePasswordParam.getNewPassword());
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
 	@ResponseBody
-	public void createUser(@RequestBody CreateUserParam createUserParam) throws BusinessException {
-		this.userService.createUser(createUserParam);
+	public User createUser(@RequestBody CreateUserParam createUserParam)
+			throws BusinessException {
+		return this.userService.createUser(createUserParam);
+	}
+
+	@RequestMapping(method = RequestMethod.DELETE)
+	@ResponseBody
+	public void deleteUser(@RequestBody DeleteUserParam deleteUserParam)
+			throws BusinessException {
+		this.userService.deleteUser(deleteUserParam);
 	}
 }

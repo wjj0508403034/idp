@@ -19,6 +19,7 @@ import com.huoyun.idp.email.EmailTemplateNames;
 import com.huoyun.idp.email.impl.EmailTemplateImpl;
 import com.huoyun.idp.exception.BusinessException;
 import com.huoyun.idp.internal.api.user.CreateUserParam;
+import com.huoyun.idp.internal.api.user.DeleteUserParam;
 import com.huoyun.idp.tenant.Tenant;
 import com.huoyun.idp.tenant.repository.TenantRepo;
 import com.huoyun.idp.user.UserErrorCodes;
@@ -52,14 +53,16 @@ public class UserServiceImpl implements UserService {
 
 	@Transactional
 	@Override
-	public void changePassword(Long userId, String oldPassword, String newPassword) throws BusinessException {
+	public void changePassword(Long userId, String oldPassword,
+			String newPassword) throws BusinessException {
 		User user = this.facade.getService(UserRepo.class).getUserById(userId);
 		if (user == null) {
 			throw new BusinessException(ErrorCode.User_Not_Exists);
 		}
 
 		if (!StringUtils.equals(oldPassword, user.getPassword())) {
-			throw new BusinessException(UserErrorCodes.Change_Password_Old_Password_Invalid);
+			throw new BusinessException(
+					UserErrorCodes.Change_Password_Old_Password_Invalid);
 		}
 
 		user.setPassword(newPassword);
@@ -68,14 +71,20 @@ public class UserServiceImpl implements UserService {
 
 	/*
 	 * For internal api call
-	 * @see com.huoyun.idp.user.UserService#createUser(com.huoyun.idp.internal.api.user.CreateUserParam)
+	 * 
+	 * @see
+	 * com.huoyun.idp.user.UserService#createUser(com.huoyun.idp.internal.api
+	 * .user.CreateUserParam)
 	 */
 	@Transactional(rollbackFor = BusinessException.class)
 	@Override
-	public void createUser(CreateUserParam createUserParam) throws BusinessException {
-		Tenant tenant = this.facade.getService(TenantRepo.class).getTenantByTenantCode(createUserParam.getTenantCode());
+	public User createUser(CreateUserParam createUserParam)
+			throws BusinessException {
+		Tenant tenant = this.facade.getService(TenantRepo.class)
+				.getTenantByTenantCode(createUserParam.getTenantCode());
 		if (tenant == null) {
-			throw new BusinessException(UserErrorCodes.Create_User_Failed_Due_To_Tenant_Not_Exists);
+			throw new BusinessException(
+					UserErrorCodes.Create_User_Failed_Due_To_Tenant_Not_Exists);
 		}
 
 		this.checkUserExistsBeforeCreate(createUserParam.getEmail());
@@ -88,13 +97,31 @@ public class UserServiceImpl implements UserService {
 		user.setActiveCode(UUID.randomUUID().toString());
 		user.setActiveDate(DateTime.now());
 		this.facade.getService(UserRepo.class).save(user);
-		
+
 		this.sendUserInitPasswordMail(user);
+
+		return user;
 	}
 
 	@Transactional(rollbackFor = BusinessException.class)
 	@Override
-	public User createUser(Tenant tenant, CreateTenantParam tenantParam) throws BusinessException {
+	public void deleteUser(DeleteUserParam deleteUserParam)
+			throws BusinessException {
+		Tenant tenant = this.facade.getService(TenantRepo.class)
+				.getTenantByTenantCode(deleteUserParam.getTenantCode());
+		if (tenant == null) {
+			throw new BusinessException(
+					UserErrorCodes.Delete_User_Failed_Due_To_Tenant_Not_Exists);
+		}
+
+		this.facade.getService(UserRepo.class).deleteUserByEmailAndTenant(
+				deleteUserParam.getEmail(), tenant);
+	}
+
+	@Transactional(rollbackFor = BusinessException.class)
+	@Override
+	public User createUser(Tenant tenant, CreateTenantParam tenantParam)
+			throws BusinessException {
 		this.checkUserExistsBeforeCreate(tenantParam.getEmail());
 
 		User user = new User();
@@ -109,7 +136,8 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public void verifyActiveCode(String activeCode) throws BusinessException {
-		User user = this.facade.getService(UserRepo.class).getUserByActiveCode(activeCode);
+		User user = this.facade.getService(UserRepo.class).getUserByActiveCode(
+				activeCode);
 
 		if (user == null) {
 			throw new BusinessException(UserErrorCodes.Active_Code_Not_Exists);
@@ -125,9 +153,11 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void initPassword(InitPasswordParam initPasswordParam) throws BusinessException {
+	public void initPassword(InitPasswordParam initPasswordParam)
+			throws BusinessException {
 		this.verifyActiveCode(initPasswordParam.getActiveCode());
-		User user = this.facade.getService(UserRepo.class).getUserByActiveCode(initPasswordParam.getActiveCode());
+		User user = this.facade.getService(UserRepo.class).getUserByActiveCode(
+				initPasswordParam.getActiveCode());
 		user.setPassword(initPasswordParam.getPassword());
 		user.setActive(true);
 		this.facade.getService(UserRepo.class).save(user);
@@ -135,13 +165,16 @@ public class UserServiceImpl implements UserService {
 
 	@Transactional(rollbackFor = BusinessException.class)
 	@Override
-	public void requestForgetPassword(ForgetPasswordParam forgetPasswordParam) throws BusinessException {
-		User user = this.facade.getService(UserRepo.class).getUserByEmail(forgetPasswordParam.getEmail());
+	public void requestForgetPassword(ForgetPasswordParam forgetPasswordParam)
+			throws BusinessException {
+		User user = this.facade.getService(UserRepo.class).getUserByEmail(
+				forgetPasswordParam.getEmail());
 		if (user == null) {
 			throw new BusinessException(UserErrorCodes.User_Not_Exists);
 		}
 
-		this.facade.getService(ForgetPasswordHistoryRepo.class).deactiveRequests(user);
+		this.facade.getService(ForgetPasswordHistoryRepo.class)
+				.deactiveRequests(user);
 		ForgetPasswordHistory history = new ForgetPasswordHistory();
 		history.setUser(user);
 		history.setRequestCode(UUID.randomUUID().toString());
@@ -151,64 +184,80 @@ public class UserServiceImpl implements UserService {
 
 		String forgetPasswordLink = this.combinePath(this.getIDPDomain(),
 				"resetPassword.html?requestCode=" + history.getRequestCode());
-		EmailTemplate template = new EmailTemplateImpl(EmailTemplateNames.User_Request_Change_Password);
+		EmailTemplate template = new EmailTemplateImpl(
+				EmailTemplateNames.User_Request_Change_Password);
 		template.setVariable("user", user);
 		template.setVariable("history", history);
 		template.setVariable("link", forgetPasswordLink);
-		this.facade.getService(EmailService.class).send(user.getEmail(), template);
+		this.facade.getService(EmailService.class).send(user.getEmail(),
+				template);
 	}
 
 	@Override
-	public void verifyChangePasswordRequestCode(String requestCode) throws BusinessException {
-		ForgetPasswordHistory history = this.facade.getService(ForgetPasswordHistoryRepo.class)
-				.getHistoryByRequestCode(requestCode);
+	public void verifyChangePasswordRequestCode(String requestCode)
+			throws BusinessException {
+		ForgetPasswordHistory history = this.facade.getService(
+				ForgetPasswordHistoryRepo.class).getHistoryByRequestCode(
+				requestCode);
 		if (history == null) {
-			throw new BusinessException(UserErrorCodes.Change_Password_Request_Code_Not_Exists);
+			throw new BusinessException(
+					UserErrorCodes.Change_Password_Request_Code_Not_Exists);
 		}
 
 		if (!history.isActive()) {
-			throw new BusinessException(UserErrorCodes.Change_Password_Request_Code_Invalid);
+			throw new BusinessException(
+					UserErrorCodes.Change_Password_Request_Code_Invalid);
 		}
 
 		if (history.getRequestDate().plusDays(1).isBeforeNow()) {
-			throw new BusinessException(UserErrorCodes.Change_Password_Request_Code_Is_Expired);
+			throw new BusinessException(
+					UserErrorCodes.Change_Password_Request_Code_Is_Expired);
 		}
 
 	}
 
 	@Transactional(rollbackFor = BusinessException.class)
 	@Override
-	public void resetPassword(ResetPasswordParam resetPasswordParam) throws BusinessException {
-		this.verifyChangePasswordRequestCode(resetPasswordParam.getRequestCode());
+	public void resetPassword(ResetPasswordParam resetPasswordParam)
+			throws BusinessException {
+		this.verifyChangePasswordRequestCode(resetPasswordParam
+				.getRequestCode());
 
-		ForgetPasswordHistory history = this.facade.getService(ForgetPasswordHistoryRepo.class)
-				.getHistoryByRequestCode(resetPasswordParam.getRequestCode());
+		ForgetPasswordHistory history = this.facade.getService(
+				ForgetPasswordHistoryRepo.class).getHistoryByRequestCode(
+				resetPasswordParam.getRequestCode());
 		history.setActive(false);
 		this.facade.getService(ForgetPasswordHistoryRepo.class).save(history);
 		User user = history.getUser();
 		user.setPassword(resetPasswordParam.getPassword());
 		this.facade.getService(UserRepo.class).save(user);
 	}
-	
 
 	@Override
 	public void sendUserInitPasswordMail(User user) throws BusinessException {
-		String activeLink = this.combinePath(this.getIDPDomain(), "initPassword.html?activeCode=" + user.getActiveCode());
-		EmailTemplate template = new EmailTemplateImpl(EmailTemplateNames.User_Set_Init_Password);
+		String activeLink = this.combinePath(this.getIDPDomain(),
+				"initPassword.html?activeCode=" + user.getActiveCode());
+		EmailTemplate template = new EmailTemplateImpl(
+				EmailTemplateNames.User_Set_Init_Password);
 		template.setVariable("user", user);
 		template.setVariable("link", activeLink);
-		this.facade.getService(EmailService.class).send(user.getEmail(), template);
+		this.facade.getService(EmailService.class).send(user.getEmail(),
+				template);
 	}
 
-	private void checkUserExistsBeforeCreate(String email) throws BusinessException {
-		boolean userExists = this.facade.getService(UserRepo.class).exists(email);
+	private void checkUserExistsBeforeCreate(String email)
+			throws BusinessException {
+		boolean userExists = this.facade.getService(UserRepo.class).exists(
+				email);
 		if (userExists) {
-			throw new BusinessException(UserErrorCodes.Create_User_Failed_Due_To_User_Exists);
+			throw new BusinessException(
+					UserErrorCodes.Create_User_Failed_Due_To_User_Exists);
 		}
 	}
 
 	private String getIDPDomain() throws BusinessException {
-		Domain domain = this.facade.getService(DomainService.class).getDomainByName(IDP);
+		Domain domain = this.facade.getService(DomainService.class)
+				.getDomainByName(IDP);
 		if (domain == null) {
 			throw new BusinessException(UserErrorCodes.IDP_Domain_Is_Empty);
 		}
@@ -231,6 +280,5 @@ public class UserServiceImpl implements UserService {
 
 		return builder.toString();
 	}
-
 
 }

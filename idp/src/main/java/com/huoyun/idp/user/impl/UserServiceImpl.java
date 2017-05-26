@@ -18,8 +18,10 @@ import com.huoyun.idp.email.EmailTemplate;
 import com.huoyun.idp.email.EmailTemplateNames;
 import com.huoyun.idp.email.impl.EmailTemplateImpl;
 import com.huoyun.idp.exception.BusinessException;
+import com.huoyun.idp.exception.LocatableBusinessException;
 import com.huoyun.idp.internal.api.user.CreateUserParam;
 import com.huoyun.idp.internal.api.user.DeleteUserParam;
+import com.huoyun.idp.saml2.Saml2ErrorCodes;
 import com.huoyun.idp.tenant.Tenant;
 import com.huoyun.idp.tenant.repository.TenantRepo;
 import com.huoyun.idp.user.UserErrorCodes;
@@ -43,6 +45,35 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User getUserByName(String username) {
 		return this.facade.getService(UserRepo.class).getUserByEmail(username);
+	}
+
+	@Override
+	public User login(String userName, String password)
+			throws LocatableBusinessException {
+		if (StringUtils.isEmpty(userName)) {
+			throw new LocatableBusinessException(
+					Saml2ErrorCodes.Login_UserName_IsEmpty, "username");
+		}
+
+		if (StringUtils.isEmpty(password)) {
+			throw new LocatableBusinessException(
+					Saml2ErrorCodes.Login_Password_IsEmpty, "password");
+		}
+
+		User user = this.facade.getService(UserRepo.class).getUserByEmail(
+				userName);
+
+		if (user == null) {
+			throw new LocatableBusinessException(
+					Saml2ErrorCodes.Login_UserName_IsEmpty, "username");
+		}
+
+		if (!StringUtils.equals(user.getPassword(), password)) {
+			throw new LocatableBusinessException(
+					Saml2ErrorCodes.Login_Password_Invalid, "password");
+		}
+
+		return user;
 	}
 
 	@Override

@@ -9,13 +9,9 @@ import org.springframework.boot.context.embedded.ServletListenerRegistrationBean
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.session.data.redis.config.ConfigureRedisAction;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import org.thymeleaf.spring4.SpringTemplateEngine;
-import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
-
 import com.huoyun.idp.common.Facade;
 import com.huoyun.idp.internal.api.InternalApiAuthenticationFilter;
 import com.huoyun.idp.redis.RedisSessionRepositoryFilter;
@@ -63,24 +59,6 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 		registrationBean.setName("InternalApiFilter");
 		registrationBean.setOrder(1);
 		return registrationBean;
-	}
-
-	@Primary
-	@Bean
-	public SpringTemplateEngine templateEngine() {
-		SpringTemplateEngine templateEngine = new SpringTemplateEngine();
-		templateEngine.addTemplateResolver(htmlTemplateResolver());
-		return templateEngine;
-	}
-
-	private ClassLoaderTemplateResolver htmlTemplateResolver() {
-		ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
-		templateResolver.setPrefix("classpath:/templates");
-		templateResolver.setTemplateMode("LEGACYHTML5");
-		templateResolver.setSuffix(".html");
-		templateResolver.setOrder(1);
-		templateResolver.setCacheable(false);
-		return templateResolver;
 	}
 
 }

@@ -2,6 +2,7 @@ package com.huoyun.idp.user;
 
 import com.huoyun.idp.admin.tenant.CreateTenantParam;
 import com.huoyun.idp.exception.BusinessException;
+import com.huoyun.idp.exception.LocatableBusinessException;
 import com.huoyun.idp.internal.api.user.CreateUserParam;
 import com.huoyun.idp.internal.api.user.DeleteUserParam;
 import com.huoyun.idp.tenant.Tenant;
@@ -13,6 +14,8 @@ import com.huoyun.idp.view.user.ResetPasswordParam;
 public interface UserService {
 
 	User getUserByName(String username);
+	
+	User login(String userName,String password) throws LocatableBusinessException;
 
 	void createUser(User user);
 

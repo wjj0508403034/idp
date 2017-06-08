@@ -22,6 +22,7 @@ import com.huoyun.idp.constants.EndpointsConstants;
 import com.huoyun.idp.exception.BusinessException;
 import com.huoyun.idp.exception.LocatableBusinessException;
 import com.huoyun.idp.saml2.SAML2Constants;
+import com.huoyun.idp.saml2.Saml2ErrorCodes;
 import com.huoyun.idp.saml2.configuration.SAML2IdPConfigurationFactory;
 import com.huoyun.idp.saml2.sso.SingleSingOnService;
 import com.huoyun.idp.session.SessionManager;
@@ -31,6 +32,7 @@ import com.huoyun.idp.web.ViewConstants;
 import com.sap.security.saml2.cfg.interfaces.SAML2IdPConfiguration;
 import com.sap.security.saml2.idp.session.IdPSession;
 import com.sap.security.saml2.lib.bindings.HTTPPostBinding;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,15 +82,23 @@ public class SingleSignOnController {
 			@RequestParam("SAMLRequest") String samlRequest,
 			@RequestParam(value = "RelayState", required = false) String relayState,
 			HttpServletRequest httpRequest, HttpServletResponse httpResponse,
-			Model model) throws BusinessException {
+			Model model) {
 		httpResponse.setHeader("Cache-Control", "no-cache");
+		Map<String, String> errors = new HashMap<>();
+		model.addAttribute("errors", errors);
 
 		if (this.singleSingOnService.isSignOn(httpRequest)) {
 			User user = sessionManager.getUser(httpRequest);
 			if (user != null) {
-				this.singleSingOnService.processLogin(httpRequest, samlRequest,
-						relayState, model);
-				return ViewConstants.Login_Waitting;
+				try {
+					this.singleSingOnService.processLogin(httpRequest,
+							samlRequest, relayState, model);
+					return ViewConstants.Login_Waitting;
+				} catch (BusinessException ex) {
+					logger.error("Login failed.", ex);
+					errors.put("username",
+							Saml2ErrorCodes.Saml_login_Process_Error);
+				}
 			}
 
 			sessionManager.invalidateLoginSession(httpRequest);
@@ -107,11 +117,11 @@ public class SingleSignOnController {
 			@RequestParam("username") String username,
 			@RequestParam("password") String password,
 			HttpServletRequest httpRequest, HttpServletResponse httpResponse,
-			Model model) throws BusinessException {
+			Model model) {
 		logger.info("Start to login, username: {}", username);
-		
+
 		refreshSession(httpRequest);
-		
+
 		httpResponse.setHeader("Cache-Control", "no-cache");
 		Map<String, String> errors = new HashMap<>();
 		model.addAttribute("errors", errors);
@@ -135,10 +145,17 @@ public class SingleSignOnController {
 					+ this.idpConfigurationFactory.getDefaultSPLocation();
 		}
 
-		this.singleSingOnService.processLogin(httpRequest, samlRequest,
-				relayState, model, user);
-
-		return ViewConstants.Login_Waitting;
+		try {
+			this.singleSingOnService.processLogin(httpRequest, samlRequest,
+					relayState, model, user);
+			return ViewConstants.Login_Waitting;
+		} catch (BusinessException ex) {
+			logger.error("Login failed.", ex);
+			errors.put("username", Saml2ErrorCodes.Saml_login_Process_Error);
+			model.addAttribute(HTTPPostBinding.SAML_REQUEST, samlRequest);
+			model.addAttribute(HTTPPostBinding.SAML_RELAY_STATE, relayState);
+			return ViewConstants.Login;
+		}
 	}
 
 	private void refreshSession(HttpServletRequest httpRequest) {

@@ -25,10 +25,8 @@ import com.sap.security.saml2.idp.session.IdPSession;
 import com.sap.security.saml2.idp.session.SPSession;
 import com.sap.security.saml2.lib.bindings.HTTPPostBinding;
 import com.sap.security.saml2.lib.common.SAML2Exception;
-import com.sap.security.saml2.lib.common.SAML2ProtocolFactory;
 import com.sap.security.saml2.lib.common.SAML2Utils;
 import com.sap.security.saml2.lib.common.exceptions.SAML2ErrorResponseException;
-import com.sap.security.saml2.lib.interfaces.protocols.SAML2AuthRequest;
 import com.sap.security.saml2.lib.interfaces.protocols.SAML2Response;
 
 public class SingleSingOnServiceImpl implements SingleSingOnService {
@@ -56,83 +54,46 @@ public class SingleSingOnServiceImpl implements SingleSingOnService {
 		return this.sessionManager.getIdPSession(req) != null;
 	}
 
+	/*
+	 * User login with session
+	 */
 	@Override
 	public void processLogin(HttpServletRequest req, String samlRequest,
 			String relayState, Model model) throws BusinessException {
+		LOGGER.info("User login with session...");
 		User user = sessionManager.getUser(req);
-
-		try {
-			String authnRequestXML = SAML2Utils
-					.decodeBase64AsString(samlRequest);
-			SAML2IdPConfiguration idpDefaultConfig = idpConfigurationFactory
-					.getDefaultSAML2IdpConfiguration();
-		
-			SSORequestInfo ssoRequestInfo = saml2BuilderFactory
-					.validateAuthnRequestHttpBody(idpDefaultConfig, authnRequestXML,
-							relayState, req.getRequestURL().toString());
-			SPSession spSession = sessionManager.saveLoginSession(req,
-					idpDefaultConfig, ssoRequestInfo, user);
-
-			LoginData loginData = this.getLoginData(user);
-			IdPSession idpSession = sessionManager.getIdPSession(req);
-			AssertionData data = new AssertionData(idpSession.getSubjectId());
-			data.setSessionIndex(spSession.getSessionIndex());
-			data.setAttributes(loginData.getValue());
-			
-			SAML2IdPConfiguration idpConfig = sessionManager
-					.getIdPConfiguration(req);
-			
-			SAML2Response saml2Response = saml2IdPAPI.createSSOResponse(
-					idpConfig, spSession.getSPName(), data);
-			String saml2ResponseString = SAML2Utils
-					.encodeBase64AsString(saml2Response.generate());
-			model.addAttribute(SessionIndex,
-					this.getOrCreateSessionIndex(req, idpSession));
-			model.addAttribute(HTTPPostBinding.SAML_RESPONSE,
-					saml2ResponseString);
-			model.addAttribute(HTTPPostBinding.SAML_RELAY_STATE, relayState);
-			model.addAttribute(SAML2Constants.DESTINATION,
-					saml2Response.getDestination());
-
-		} catch (Exception ex) {
-			throw new BusinessException(
-					Saml2ErrorCodes.Saml_login_Process_Error);
-		}
-
+		SAML2IdPConfiguration idpConfig = sessionManager
+				.getIdPConfiguration(req);
+		this.process(req, samlRequest, relayState, model, user, idpConfig);
+		LOGGER.info("User login with session success.");
 	}
-	
+
+	/*
+	 * User first login
+	 */
 	@Override
 	public void processLogin(HttpServletRequest req, String samlRequest,
 			String relayState, Model model, User user) throws BusinessException {
-		try {
-			String authnRequestXML = SAML2Utils
-					.decodeBase64AsString(samlRequest);
-			SAML2IdPConfiguration idpDefaultConfig = idpConfigurationFactory
-					.getDefaultSAML2IdpConfiguration();
-		
-			SSORequestInfo ssoRequestInfo = saml2BuilderFactory
-					.validateAuthnRequestHttpBody(idpDefaultConfig, authnRequestXML,
-							relayState, req.getRequestURL().toString());
-			SPSession spSession = sessionManager.saveLoginSession(req,
-					idpDefaultConfig, ssoRequestInfo, user);
-//			SPSession spSession = sessionManager.saveLoginSession(req,
-//					ssoRequestInfo);
+		LOGGER.info("User first login ...");
+		SAML2IdPConfiguration idpConfig = idpConfigurationFactory
+				.getDefaultSAML2IdpConfiguration();
 
-			LoginData loginData = this.getLoginData(user);
-			IdPSession idpSession = sessionManager.getIdPSession(req);
-			AssertionData data = new AssertionData(idpSession.getSubjectId());
-			data.setSessionIndex(spSession.getSessionIndex());
-			data.setAttributes(loginData.getValue());
-			
-			SAML2IdPConfiguration idpConfig = sessionManager
-					.getIdPConfiguration(req);
-			
-			SAML2Response saml2Response = saml2IdPAPI.createSSOResponse(
-					idpConfig, spSession.getSPName(), data);
+		this.process(req, samlRequest, relayState, model, user, idpConfig);
+		LOGGER.info("User first login success.");
+	}
+
+	private void process(HttpServletRequest req, String samlRequest,
+			String relayState, Model model, User user,
+			SAML2IdPConfiguration idpConfig) throws BusinessException {
+		try {
+			SSORequestInfo ssoRequestInfo = this.validateAuthnRequest(req,
+					samlRequest, relayState);
+
+			SAML2Response saml2Response = this.createSSOResponse(req,
+					idpConfig, ssoRequestInfo, user);
 			String saml2ResponseString = SAML2Utils
 					.encodeBase64AsString(saml2Response.generate());
-			model.addAttribute(SessionIndex,
-					this.getOrCreateSessionIndex(req, idpSession));
+			model.addAttribute(SessionIndex, this.getOrCreateSessionIndex(req));
 			model.addAttribute(HTTPPostBinding.SAML_RESPONSE,
 					saml2ResponseString);
 			model.addAttribute(HTTPPostBinding.SAML_RELAY_STATE, relayState);
@@ -143,7 +104,37 @@ public class SingleSingOnServiceImpl implements SingleSingOnService {
 			throw new BusinessException(
 					Saml2ErrorCodes.Saml_login_Process_Error);
 		}
+	}
 
+	private SAML2Response createSSOResponse(HttpServletRequest req,
+			SAML2IdPConfiguration idpConfig, SSORequestInfo ssoRequestInfo,
+			User user) throws SAML2Exception, SAML2ConfigurationException {
+
+		SPSession spSession = sessionManager.saveLoginSession(req, idpConfig,
+				ssoRequestInfo, user);
+
+		LoginData loginData = this.getLoginData(user);
+		IdPSession idpSession = sessionManager.getIdPSession(req);
+		AssertionData data = new AssertionData(idpSession.getSubjectId());
+		data.setSessionIndex(spSession.getSessionIndex());
+		data.setAttributes(loginData.getValue());
+
+		idpConfig = sessionManager.getIdPConfiguration(req);
+		return saml2IdPAPI.createSSOResponse(idpConfig, spSession.getSPName(),
+				data);
+	}
+
+	private SSORequestInfo validateAuthnRequest(HttpServletRequest req,
+			String samlRequest, String relayState)
+			throws SAML2ErrorResponseException, SAML2Exception,
+			SAML2ConfigurationException {
+		String authnRequestXML = SAML2Utils.decodeBase64AsString(samlRequest);
+		SAML2IdPConfiguration idpDefaultConfig = idpConfigurationFactory
+				.getDefaultSAML2IdpConfiguration();
+
+		return saml2BuilderFactory.validateAuthnRequestHttpBody(
+				idpDefaultConfig, authnRequestXML, relayState, req
+						.getRequestURL().toString());
 	}
 
 	private LoginData getLoginData(User user) {
@@ -152,8 +143,8 @@ public class SingleSingOnServiceImpl implements SingleSingOnService {
 		return loginData;
 	}
 
-	private String getOrCreateSessionIndex(HttpServletRequest req,
-			IdPSession idpSession) {
+	private String getOrCreateSessionIndex(HttpServletRequest req) {
+		IdPSession idpSession = sessionManager.getIdPSession(req);
 		String sessionIndex = (String) req.getSession().getAttribute(
 				SessionIndex);
 		if (StringUtils.isEmpty(sessionIndex)) {
@@ -162,29 +153,4 @@ public class SingleSingOnServiceImpl implements SingleSingOnService {
 
 		return Integer.toHexString(idpSession.hashCode());
 	}
-
-	public SSORequestInfo validateAuthnRequest(
-			SAML2IdPConfiguration configuration, String authnRequestXML,
-			String relayState, String recipientUrl) throws SAML2Exception,
-			SAML2ConfigurationException, SAML2ErrorResponseException {
-		LOGGER.info("validateAuthnRequestHttpBody start...");
-
-		SAML2AuthRequest saml2AuthnRequest = null;
-		try {
-			saml2AuthnRequest = SAML2ProtocolFactory.getInstance()
-					.createAuthnRequest(authnRequestXML);
-			saml2AuthnRequest.parse();
-		} catch (SAML2Exception e) {
-			throw new SAML2Exception(
-					"Could not parse the given authentication request XML", e);
-		}
-		SSORequestInfo ssoRequestInfo = new SSORequestInfo(saml2AuthnRequest);
-		ssoRequestInfo.setRelayState(relayState);
-
-		LOGGER.info("validateAuthnRequestHttpBody end...");
-		return ssoRequestInfo;
-	}
-
-
-
 }

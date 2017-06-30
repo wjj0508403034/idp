@@ -21,6 +21,7 @@ import com.huoyun.idp.exception.BusinessException;
 import com.huoyun.idp.exception.LocatableBusinessException;
 import com.huoyun.idp.internal.api.user.CreateUserParam;
 import com.huoyun.idp.internal.api.user.DeleteUserParam;
+import com.huoyun.idp.internal.api.user.UpdateUserParam;
 import com.huoyun.idp.saml2.Saml2ErrorCodes;
 import com.huoyun.idp.tenant.Tenant;
 import com.huoyun.idp.tenant.repository.TenantRepo;
@@ -73,6 +74,11 @@ public class UserServiceImpl implements UserService {
 					Saml2ErrorCodes.Login_Password_Invalid, "password");
 		}
 
+		if (user.isLocked()) {
+			throw new LocatableBusinessException(
+					Saml2ErrorCodes.Account_Is_Locked, "username");
+		}
+
 		return user;
 	}
 
@@ -118,7 +124,8 @@ public class UserServiceImpl implements UserService {
 					UserErrorCodes.Create_User_Failed_Due_To_Tenant_Not_Exists);
 		}
 
-		this.checkUserExistsBeforeCreate(createUserParam.getEmail());
+		this.checkUserExistsBeforeCreate(createUserParam.getEmail(),
+				createUserParam.getPhone());
 
 		User user = new User();
 		user.setTenant(tenant);
@@ -153,7 +160,8 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User createUser(Tenant tenant, CreateTenantParam tenantParam)
 			throws BusinessException {
-		this.checkUserExistsBeforeCreate(tenantParam.getEmail());
+		this.checkUserExistsBeforeCreate(tenantParam.getEmail(),
+				tenantParam.getPhone());
 
 		User user = new User();
 		user.setTenant(tenant);
@@ -163,6 +171,14 @@ public class UserServiceImpl implements UserService {
 		user.setActiveCode(UUID.randomUUID().toString());
 		user.setActiveDate(DateTime.now());
 		return this.facade.getService(UserRepo.class).save(user);
+	}
+	
+	@Override
+	public void updateUser(UpdateUserParam updateUserParam)
+			throws BusinessException {
+		User user = this.facade.getService(UserRepo.class).getUserById(updateUserParam.getUserId());
+		user.setLocked(updateUserParam.isLocked());
+		this.facade.getService(UserRepo.class).save(user);
 	}
 
 	@Override
@@ -275,11 +291,13 @@ public class UserServiceImpl implements UserService {
 		this.facade.getService(EmailService.class).send(user.getEmail(),
 				template);
 	}
+	
 
-	private void checkUserExistsBeforeCreate(String email)
+
+	private void checkUserExistsBeforeCreate(String email, String phone)
 			throws BusinessException {
 		boolean userExists = this.facade.getService(UserRepo.class).exists(
-				email);
+				email, phone);
 		if (userExists) {
 			throw new BusinessException(
 					UserErrorCodes.Create_User_Failed_Due_To_User_Exists);
@@ -311,5 +329,7 @@ public class UserServiceImpl implements UserService {
 
 		return builder.toString();
 	}
+
+
 
 }

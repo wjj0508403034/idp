@@ -34,6 +34,14 @@ public class UserController {
 			throws BusinessException {
 		return this.userService.createUser(createUserParam);
 	}
+	
+	
+	@RequestMapping(method = RequestMethod.PATCH)
+	@ResponseBody
+	public void updateUser(@RequestBody UpdateUserParam updateUserParam)
+			throws BusinessException {
+		this.userService.updateUser(updateUserParam);
+	}
 
 	@RequestMapping(method = RequestMethod.DELETE)
 	@ResponseBody

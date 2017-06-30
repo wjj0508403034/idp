@@ -23,6 +23,9 @@ public interface UserRepo extends PagingAndSortingRepository<User,Long> {
 	@Query("select count(t) > 0 from User t where t.email = ?1")
 	boolean exists(String email);
 	
+	@Query("select count(t) > 0 from User t where t.email = ?1 or t.phone = ?2")
+	boolean exists(String email, String phone);
+	
 	@Query("select t from User t where t.activeCode = ?1")
 	User getUserByActiveCode(String activeCode);
 	

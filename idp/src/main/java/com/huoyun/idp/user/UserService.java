@@ -5,6 +5,7 @@ import com.huoyun.idp.exception.BusinessException;
 import com.huoyun.idp.exception.LocatableBusinessException;
 import com.huoyun.idp.internal.api.user.CreateUserParam;
 import com.huoyun.idp.internal.api.user.DeleteUserParam;
+import com.huoyun.idp.internal.api.user.UpdateUserParam;
 import com.huoyun.idp.tenant.Tenant;
 import com.huoyun.idp.user.entity.User;
 import com.huoyun.idp.view.user.ForgetPasswordParam;
@@ -38,4 +39,6 @@ public interface UserService {
 	void sendUserInitPasswordMail(User user) throws BusinessException;
 
 	void deleteUser(DeleteUserParam deleteUserParam) throws BusinessException;
+
+	void updateUser(UpdateUserParam updateUserParam) throws BusinessException;
 }

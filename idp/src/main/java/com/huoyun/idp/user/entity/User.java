@@ -155,5 +155,4 @@ public class User extends AbstractBusinessObject {
 	public void setLocked(boolean locked) {
 		this.locked = locked;
 	}
-
 }

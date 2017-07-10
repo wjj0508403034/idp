@@ -1,0 +1,379 @@
+/*base css*/
+/*-------------------------------------------------重置reset-------------------------------------------------------*/
+a:link, a:visited {
+	text-decoration: none;
+	color: #2898e0;
+}
+
+a:hover {
+	color: #006cb1;
+	text-decoration: underline;
+}
+
+input, button, select, textarea {
+	outline: none
+}
+
+textarea {
+	resize: none;
+}
+
+body {
+	font-size: 12px;
+	color: #525252;
+	font-family: "微软雅黑", Arial, Helvetica, sans-serif;
+	height: 100%;
+	background: #f7f8f8;
+}
+
+input {
+	font-size: 12px;
+	font-family: "微软雅黑", Arial, Helvetica, sans-serif;
+}
+
+input:text {
+	border: 1px solid #ccc;
+}
+
+input:password {
+	border: 1px solid #ccc;
+}
+
+button {
+	font-size: 12px;
+	font-family: "微软雅黑", Arial, Helvetica, sans-serif;
+}
+
+select {
+	font-size: 12px;
+	font-family: "微软雅黑", Arial, Helvetica, sans-serif;
+	border: 1px solid #ccc;
+}
+
+textarea {
+	font-family: "微软雅黑", Arial, Helvetica, sans-serif;
+	border: 1px solid #ccc;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+}
+
+h1 {
+	font-size: 24px;
+	line-height: 44px;
+	font-weight: bold;
+	margin-top: 0;
+	margin-bottom: 0;
+	t-family: "微软雅黑", Arial, Helvetica, sans-serif;
+}
+
+h2 {
+	font-size: 18px;
+	line-height: 40px;
+	font-weight: bold;
+	margin-top: 0;
+	margin-bottom: 0;
+	font-family: "微软雅黑", Arial, Helvetica, sans-serif;
+}
+
+h3 {
+	font-size: 16px;
+	line-height: 32px;
+	font-weight: bold;
+	margin-top: 0;
+	margin-bottom: 0;
+	font-family: "微软雅黑", Arial, Helvetica, sans-serif;
+}
+
+h4 {
+	font-size: 14px;
+	line-height: 26px;
+	font-weight: bold;
+	margin-top: 0;
+	margin-bottom: 0;
+	font-family: "微软雅黑", Arial, Helvetica, sans-serif;
+}
+
+h5 {
+	font-size: 12px;
+	line-height: 24px;
+	font-weight: bold;
+	font-family: "微软雅黑", Arial, Helvetica, sans-serif;
+}
+
+h6 {
+	font-size: 10px;
+	line-height: 18px;
+	font-weight: bold;
+	margin-top: 0;
+	margin-bottom: 0;
+	font-family: "微软雅黑", Arial, Helvetica, sans-serif;
+}
+
+img {
+	border: 0;
+}
+
+ul, ol {
+	list-style: none;
+}
+
+textarea {
+	font-size: 12px;
+}
+/*-------------------------------------------------Formstyle-------------------------------------------------------*/
+/*==================form表单样式1=========================*/
+.formStyle {
+	width: 800px;
+}
+
+.formStyle input {
+	width: 150px;
+	float: left;
+}
+
+.formStyle select {
+	width: 154px;
+	height: 20px;
+	float: left;
+}
+
+.formStyle textarea {
+	float: left;
+	width: 300px;
+	height: 100px;
+}
+
+.formStyle .checkbox {
+	width: 20px;
+}
+
+.formStyle .file {
+	width: 250px;
+}
+
+* html .formStyle .file {
+	width: 226px;
+}
+
+.formStyle li {
+	clear: both;
+	height: 24px;
+	margin: 0 15px 2px 0;
+}
+
+* html .formStyle li {
+	height: 0;
+}
+
+*+html .formStyle li {
+	height: auto;
+}
+
+.formStyle li label {
+	height: 24px;
+	line-height: 24px;
+	display: block;
+	float: left;
+	width: 70px;
+	text-align: right;
+	margin-right: 10px;
+}
+
+.formStyle .loginButton {
+	float: left;
+	margin: 5px 8px 0 0;
+}
+/*横向排列style*/
+.across {
+	width: 800px;
+}
+
+.across li {
+	clear: none;
+	float: left;
+	width: 220px;
+}
+
+* html .across li {
+	margin-right: 6px;
+}
+
+.across li label {
+	text-align: left;
+}
+/*-------------------------------------------------常用样式genal-------------------------------------------------------*/
+/*====隐藏DIV====*/
+.hidden {
+	display: none;
+}
+/*===浮动==*/
+.floatLeft {
+	float: left;
+}
+
+.floatRight {
+	float: right;
+}
+/*====清除浮动clear====*/
+.clear_float {
+	clear: both;
+}
+/*====半透明窗口alpha====*/
+#alphaWindow {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	min-width: 1000px;
+	width: 100%;
+	min-height: 500px;
+	height: 100%;
+	background-color: #000;
+	opacity: 0.3;
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+	z-index: 1000;
+}
+/*===========包含浮动元素-不支持IE6===========*/
+.clear:after {
+	content: ".";
+	display: block;
+	height: 0;
+	font-size: 0;
+	clear: both;
+	visibility: hidden;
+}
+
+.clear {
+	min-height: 1px;
+}
+/*==============*/
+/* Overlays */
+.ui-widget-overlay {
+	background: #aaaaaa /*{bgColorOverlay}*/ /*{bgImgUrlOverlay}*/ 50%
+		/*{bgOverlayXPos}*/ 50% /*{bgOverlayYPos}*/ repeat-x
+		/*{bgOverlayRepeat}*/;
+	opacity: .3;
+	filter: Alpha(Opacity = 30) /*{opacityOverlay}*/;
+}
+
+.ui-widget-shadow {
+	margin: -8px /*{offsetTopShadow}*/ 0 0 -8px /*{offsetLeftShadow}*/;
+	padding: 8px /*{thicknessShadow}*/;
+	background: #aaaaaa /*{bgColorShadow}*/ /*{bgImgUrlShadow}*/ 50%
+		/*{bgShadowXPos}*/ 50% /*{bgShadowYPos}*/ repeat-x
+		/*{bgShadowRepeat}*/;
+	opacity: .3;
+	filter: Alpha(Opacity = 30) /*{opacityShadow}*/;
+	-moz-border-radius: 8px /*{cornerRadiusShadow}*/;
+	-khtml-border-radius: 8px /*{cornerRadiusShadow}*/;
+	-webkit-border-radius: 8px /*{cornerRadiusShadow}*/;
+	border-radius: 8px /*{cornerRadiusShadow}*/;
+}
+
+.crm-register-form {
+	width: 450px;
+	margin: 0 auto;
+	padding: 50px 40px 70px 40px;
+	text-align: center;
+	border-bottom-right-radius: 3px;
+	border-bottom-left-radius: 3px;
+	-webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, .15);
+	-moz-box-shadow: 0 1px 5px rgba(0, 0, 0, .15);
+	box-shadow: 0 1px 5px rgba(0, 0, 0, .15);
+	position: relative;
+	z-index: 9;
+	border-radius: 5px;
+	position: relative;
+	background: #fff;
+}
+
+.register-wrapper {
+	position: relative;
+	overflow-x: auto;
+	overflow-y: hidden;
+	width: 100%;
+	height: 100%;
+	background: #ebedf0;
+}
+
+.isprm-register-wrapper .crm-register-bg {
+	width: 100%;
+	height: 100%;
+	background-position: center;
+	background-size: cover;
+	padding-top: 6%;
+}
+
+.crm-register-bg {
+	width: 100%;
+	height: 100%;
+	background: url(/images/lognBG.jpg);
+	background-position: center;
+	background-size: cover;
+	padding-top: 6%;
+}
+
+.crm-register-input-warpper {
+	line-height: 40px;
+	width: 100%;
+	height: 40px;
+	border: 1px solid #cfdae6;
+	border-radius: 5px;
+	background: #fff;
+	position: relative;
+}
+
+.crm-register-input-warpper .crm-register-input {
+	font-size: 16px;
+	float: left;
+	text-indent: 20px;
+	border: none;
+	background-color: transparent;
+	width: 100%;
+	margin-left: 0;
+	padding: 0;
+	height: 100%;
+}
+
+.crm-register-footer .pg-btn-submit {
+	font-size: 20px;
+	line-height: 40px;
+	width: 100%;
+	height: 40px;
+	color: #fff;
+	border-radius: 5px;
+	background: #00aaef;
+	cursor: pointer;
+	font-family: "微软雅黑", Arial, Helvetica, sans-serif;
+	border: none;
+}
+
+.crm-register-footer .pg-btn-submit:hover {
+	background: #00bbee;
+	cursor: pointer;
+}
+
+.crm-register-body>ul li {
+	margin-bottom: 20px;
+}
+
+.crm-login-form .crm-login1-header {
+	padding-bottom: 38px;
+}
+
+.login-form .form-group {
+	margin-bottom: 20px;
+}
+
+.form-group[has-error="true"] .crm-register-input-warpper {
+	border: 1px solid red;
+}
+
+.form-group[has-error="true"] .err-tip {
+	color: red;
+	text-align: left;
+	margin-top: 5px;
+}

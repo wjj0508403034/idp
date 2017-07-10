@@ -55,7 +55,7 @@ public class EmailServiceImpl implements EmailService {
 			sender.send(message);
 			LOGGER.info("Send mail successfully.");
 		} catch (Exception ex) {
-			LOGGER.info("Send mail failed.", ex);
+			LOGGER.error("Send mail failed.", ex);
 			throw new BusinessException(EmailErrorCodes.Send_Mail_Failed);
 		}
 	}

@@ -1,40 +1,52 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 
 <head>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-  <meta name="renderer" content="webkit" />
-  <meta charset="UTF-8" />
-  <title>注册</title>
-  <link rel="stylesheet" th:href="@{/libs/bootstrap.min.css}"></link>
-  <link rel="stylesheet" th:href="@{/css/login.css}"></link>
+<link rel="icon" th:href="@{images/favicon.ico}" type="image/x-icon" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="renderer" content="webkit" />
+<meta charset="UTF-8" />
+<title>注册</title>
+<link rel="stylesheet" th:href="@{/libs/bootstrap.min.css}"></link>
+<link rel="stylesheet" th:href="@{/css/login.css}"></link>
 </head>
 
 <body>
-  <div class="container-wrap">
-    <form class="login-form" role="form" action="/register" method="post">
-      <div class="form-group">
-        <label for="username" class="control-label">用户名</label>
-        <input type="text" class="form-control" id="username" name="username" placeholder="用户名" />
-        <div class="err-tip" th:if="${errors != null and errors.containsKey('username')}" th:text="#{${errors.username}}"></div>
-      </div>
-      <div class="form-group">
-        <label for="password" class="control-label">密码</label>
-        <input type="password" class="form-control" id="password" name="password" placeholder="输入密码" />
-        <div class="err-tip" th:if="${errors != null and errors.containsKey('password')}" th:text="#{${errors.password}}"></div>
-      </div>
+	<div class="container-wrap">
+		<form class="login-form" role="form" action="/register" method="post">
+			<div class="form-group">
+				<label for="username" class="control-label">用户名</label>
+				<input type="text" class="form-control" id="username"
+					name="username" placeholder="用户名" />
+				<div class="err-tip"
+					th:if="${errors != null and errors.containsKey('username')}"
+					th:text="#{${errors.username}}"></div>
+			</div>
+			<div class="form-group">
+				<label for="password" class="control-label">密码</label>
+				<input type="password" class="form-control" id="password"
+					name="password" placeholder="输入密码" />
+				<div class="err-tip"
+					th:if="${errors != null and errors.containsKey('password')}"
+					th:text="#{${errors.password}}"></div>
+			</div>
 
-      <div class="form-group">
-        <label for="password" class="control-label">重复密码</label>
-        <input type="password" class="form-control" id="repeatPassword" name="repeatPassword" placeholder="输入重复密码" />
-        <div class="err-tip" th:if="${errors != null and errors.containsKey('repeatPassword')}" th:text="#{${errors.repeatPassword}}"></div>
-      </div>
+			<div class="form-group">
+				<label for="password" class="control-label">重复密码</label>
+				<input type="password" class="form-control" id="repeatPassword"
+					name="repeatPassword" placeholder="输入重复密码" />
+				<div class="err-tip"
+					th:if="${errors != null and errors.containsKey('repeatPassword')}"
+					th:text="#{${errors.repeatPassword}}"></div>
+			</div>
 
-      <div class="form-group">
-        <button type="submit" class="btn btn-default login-button">登录</button>
-      </div>
-    </form>
-  </div>
+			<div class="form-group">
+				<button type="submit" class="btn btn-default login-button">登录</button>
+			</div>
+		</form>
+	</div>
 </body>
 
 </html>

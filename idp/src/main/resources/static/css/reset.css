@@ -1,0 +1,539 @@
+@charset 'UTF-8';
+
+/*-------------------------------------------------重置reset-------------------------------------------------------*/
+
+* {
+    box-sizing: border-box;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+}
+
+html {
+    width: 100%;
+    height: 100%;
+}
+
+a:link,
+a:visited {
+    text-decoration: none;
+    color: #3399cc;
+    outline: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+input,
+button,
+select,
+textarea {
+    outline: none;
+}
+
+textarea {
+    resize: none;
+}
+
+input::-moz-placeholder {
+    color: #adbdcc;
+}
+
+input::-webkit-input-placeholder {
+    color: #adbdcc;
+}
+
+textarea::-moz-placeholder {
+    color: #adbdcc;
+}
+
+textarea::-webkit-placeholder {
+    color: #adbdcc;
+}
+
+::-ms-clear {
+    display: none;
+}
+
+::-ms-reveal {
+    display: none;
+}
+
+body {
+    font-family: Arial, 'Hiragino Sans GB', '微软雅黑', '黑体-简', Helvetica, sans-serif;
+    font-size: 12px;
+    overflow: auto;
+    height: 100%;
+    color: #3d5266;
+    background: #fff;
+}
+
+input {
+    font-family: Arial, 'Hiragino Sans GB', '微软雅黑', '黑体-简', Helvetica, sans-serif;
+    font-size: 12px;
+    -webkit-transition: box-shadow .30s ease-in-out;
+    -moz-transition: box-shadow .30s ease-in-out;
+    -o-transition: box-shadow .30s ease-in-out;
+}
+
+input:text {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+}
+
+input:password {
+    border: 1px solid #e6e6e6;
+}
+button {
+    font-family: Arial, 'Hiragino Sans GB', 'Hiragino Sans GB', '微软雅黑', '黑体-简', Helvetica, sans-serif;
+    font-size: 12px;
+}
+
+select {
+    font-family: Arial, 'Hiragino Sans GB', '微软雅黑', '黑体-简', Helvetica, sans-serif;
+    font-size: 12px;
+    border: 1px solid #e6e6e6;
+}
+
+textarea {
+    font-family: Arial, 'Hiragino Sans GB', '微软雅黑', '黑体-简', Helvetica, sans-serif;
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 44px;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+h2 {
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 40px;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+h3 {
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 22px;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+h4 {
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 26px;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+h5 {
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 24px;
+}
+
+h6 {
+    font-size: 10px;
+    font-weight: bold;
+    line-height: 18px;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+img {
+    border: 0;
+}
+
+ul,
+ol {
+    list-style: none;
+}
+
+textarea {
+    font-size: 12px;
+    resize: none;
+}
+
+
+/** 消掉input框上的叉号 **/
+
+input::-webkit-search-cancel-button {
+    display: none;
+}
+
+input::-ms-clear {
+    display: none;
+}
+
+::-webkit-input-placeholder {
+    /* WebKit browsers */
+    color: #adbdcc;
+}
+
+:-moz-placeholder {
+    /* Mozilla Firefox 4 to 18 */
+    color: #adbdcc;
+}
+
+::-moz-placeholder {
+    /* Mozilla Firefox 19+ */
+    color: #adbdcc;
+}
+
+:-ms-input-placeholder {
+    /* Internet Explorer 10+ */
+    color: #adbdcc;
+}
+
+
+/*-------------------------------------------------常用样式genal-------------------------------------------------------*/
+
+
+/*====隐藏DIV====*/
+
+.hidden {
+    display: none;
+}
+
+.show {
+    display: inline-block;
+}
+
+
+/*===浮动==*/
+
+.floatLeft {
+    float: left;
+}
+
+.floatRight {
+    float: right;
+}
+
+
+/*====清除浮动clear====*/
+
+.clear_float {
+    clear: both;
+}
+
+
+/*====半透明窗口alpha====*/
+
+#alphaWindow {
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    display: none;
+    width: 100%;
+    min-width: 1000px;
+    height: 100%;
+    min-height: 500px;
+    opacity: .3;
+    background-color: #000;
+    filter: progid: DXImageTransform.Microsoft.Alpha(opacity=30);
+}
+
+
+/*===========包含浮动元素-不支持IE6===========*/
+
+.clear:after {
+    font-size: 0;
+    display: block;
+    visibility: hidden;
+    clear: both;
+    height: 0;
+    content: '.';
+}
+
+.clear {
+    min-height: 1px;
+}
+
+
+/*表单样式 form style*/
+
+
+input.text {
+    line-height: 30px;
+    width: 245px;
+    height: 30px;
+    padding-left: 5px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    background: #fff;
+}
+
+input.filterValue {
+    line-height: 23px;
+    width: 200px;
+    height: 23px;
+    text-indent: 3px;
+    border: 1px solid #ddd;
+    background: #fff;
+}
+
+input.form_selected {
+    border: 1px solid #2898e0;
+}
+
+
+/*常见样式总结*/
+
+.padding10 {
+    padding: 10px;
+}
+
+.padding0-10 {
+    padding: 0 10px;
+}
+
+.padding20 {
+    padding: 20px;
+}
+
+.padding20-10 {
+    padding: 20px 10px 10px 10px;
+}
+
+.margin10 {
+    margin: 10px;
+}
+
+.margin20 {
+    margin: 20px;
+}
+.mar-pad{
+    margin-left: 15px;
+    padding-bottom: 10px;
+}
+.padding-6{
+    padding: 6px 0;
+}
+.lfloat {
+    float: left;
+}
+
+.rfloat {
+    float: right;
+}
+
+.cpointer {
+    cursor: pointer;
+}
+
+.no-pointer {
+    cursor: auto;
+}
+
+.cursor-default {
+    cursor: default;
+}
+
+.cursor-text {
+    cursor: text;
+}
+
+.cursor-not-allowed {
+    cursor: not-allowed;
+}
+
+.cboth {
+    clear: both;
+}
+
+.cleft {
+    clear: left;
+}
+
+.cright {
+    clear: right;
+}
+
+.clearfix:after,
+.clearfix:before {
+    display: table;
+    content: ' ';
+}
+
+.talign-center {
+    text-align: center;
+}
+
+.talign-left {
+    text-align: left;
+}
+
+.talign-right {
+    text-align: right;
+}
+
+.valign-middle {
+    vertical-align: middle;
+}
+
+.valign-bottom {
+    vertical-align: bottom;
+}
+
+.border-radius-none {
+    border-radius: 0;
+}
+
+.border-radius0 {
+    border-radius: 3px;
+}
+
+.border-none {
+    border: none !important;
+}
+
+.tborder-none {
+    border-top: none;
+}
+
+.rborder-none {
+    border-right: none;
+}
+
+.bborder-none {
+    border-bottom: none;
+}
+
+.tborder {
+    border-top: 1px solid #e6f1fc;
+}
+
+.rborder {
+    border-right: 1px solid #e6f1fc;
+}
+
+.bborder {
+    border-bottom: 1px solid #e6f1fc;
+}
+
+.lborder {
+    border-left: 1px solid #e6f1fc;
+}
+
+.border {
+    border: 1px solid #e6f1fc;
+}
+
+.no-wrap {
+    white-space: nowrap;
+}
+
+.wrap {
+    white-space: normal;
+}
+
+.dflex {
+    display: -webkit-flex;
+    display: flex;
+}
+
+.dblock {
+    display: block;
+}
+
+.dinline-block {
+    display: inline-block;
+}
+
+.dinline-table {
+    display: inline-table;
+}
+
+.dinline-flex {
+    display: inline-flex;
+}
+
+.dinline {
+    display: inline;
+}
+
+.dhidden {
+    position: fixed;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.prelative {
+    position: relative;
+}
+
+.pstatic {
+    position: static;
+}
+
+.pabsolute {
+    position: absolute;
+}
+
+.invisible {
+    visibility: hidden;
+}
+
+.overflow-hidden {
+    overflow: hidden;
+}
+
+.overflow-x-hidden {
+    overflow-x: hidden;
+}
+
+.overflow-y-hidden {
+    overflow-y: hidden;
+}
+
+.overflow-visible {
+    overflow: visible;
+}
+
+.fill-width {
+    width: 100%;
+    min-width: 100%;
+}
+
+.fill-height {
+    height: 100%;
+    min-height: 100%;
+}
+
+.max-width-none {
+    max-width: none;
+}
+
+.fill-max-width {
+    max-width: 100%;
+}
+
+.fill-max-height {
+    max-height: 100%;
+}
+
+.ellipsis {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.btn {
+    line-height: 32px;
+    height: 32px;
+    padding: 0 18px;
+}

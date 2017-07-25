@@ -10,6 +10,8 @@ import com.huoyun.idp.servicetoken.ServiceTokenService;
 import com.huoyun.idp.servicetoken.impl.ServiceTokenServiceImpl;
 import com.huoyun.idp.tenant.TenantService;
 import com.huoyun.idp.tenant.impl.TenantServiceImpl;
+import com.huoyun.idp.trial.TrialService;
+import com.huoyun.idp.trial.impl.TrialServiceImpl;
 
 @Configuration
 public class BusinessAutoConfiguration {
@@ -27,5 +29,10 @@ public class BusinessAutoConfiguration {
 	@Bean
 	public DomainService domianService(Facade facade) {
 		return new DomainServiceImpl(facade);
+	}
+	
+	@Bean
+	public TrialService trialService(Facade facade){
+		return new TrialServiceImpl(facade);
 	}
 }

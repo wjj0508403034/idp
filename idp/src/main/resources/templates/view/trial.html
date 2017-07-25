@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>装企翼CRM-申请试用</title>
+<link rel="icon" th:href="@{/images/favicon.ico}" type="image/x-icon" />
+  <link rel="stylesheet" type="text/css" media="all" th:href="@{/css/base.css}">
+  <link rel="stylesheet" type="text/css" media="all" th:href="@{/css/reset.css}">
+</head>
+
+<body>
+  <section id="div_main" class="register-wrapper ">
+    <div class="crm-register-bg" style="overflow-y: scroll;">
+      <div class="crm-register-form crm-login-form login_box">
+        <header class="crm-login1-header">
+         <a href="http://www.fccfc.com">
+         	<img th:src="@{/images/logo.png}" width="302" height="76.5" />
+         </a>
+        </header>
+        <form class="login-form" role="form" action="#" th:action="@{/trial}" method="post" th:object="${trialParam}">
+          <div class="form-group" data-th-attr="has-error=${errors != null and errors.containsKey('companyName')}">
+
+            <div class="crm-register-input-warpper">
+              <input type="text" class="form-control crm-register-input" id="companyName" name="companyName" th:field="*{companyName}" placeholder="公司名称" />
+            </div>
+            <div class="err-tip" th:if="${errors != null and errors.containsKey('companyName')}" th:text="#{${errors.companyName}}"></div>
+          </div>
+
+          <div class="form-group" data-th-attr="has-error=${errors != null and errors.containsKey('contactPerson')}">
+            <div class="crm-register-input-warpper">
+              <input type="text" class="form-control crm-register-input" id="contactPerson" name="contactPerson" th:field="*{contactPerson}" placeholder="联系人" />
+            </div>
+            <div class="err-tip" th:if="${errors != null and errors.containsKey('contactPerson')}" th:text="#{${errors.contactPerson}}"></div>
+          </div>
+          
+          <div class="form-group" data-th-attr="has-error=${errors != null and errors.containsKey('phone')}">
+            <div class="crm-register-input-warpper">
+              <input type="text" class="form-control crm-register-input" id="phone" name="phone" th:field="*{phone}" placeholder="电话" />
+            </div>
+            <div class="err-tip" th:if="${errors != null and errors.containsKey('phone')}" th:text="#{${errors.phone}}"></div>
+          </div>
+          
+          <div class="form-group" data-th-attr="has-error=${errors != null and errors.containsKey('email')}">
+            <div class="crm-register-input-warpper">
+              <input type="text" class="form-control crm-register-input" id="email" name="email" th:field="*{email}" placeholder="邮箱" />
+            </div>
+            <div class="err-tip" th:if="${errors != null and errors.containsKey('email')}" th:text="#{${errors.email}}"></div>
+          </div>
+         
+          <div class="crm-register-footer">
+            <button type="submit" class="btn btn-default login-button pg-btn-submit dinline-block ">申请试用</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+</body>
+
+</html>
